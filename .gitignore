@@ -1,0 +1,9 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore local database
+simba.db
+
+# Ignore large model files (if it's over 50MB-100MB)
+*.h5
