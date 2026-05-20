@@ -7,3 +7,9 @@ simba.db
 
 # Ignore large model files (if it's over 50MB-100MB)
 *.h5
+
+# Ignore the massive frontend dependencies
+frontend/node_modules/
+
+# Ignore local environment variables/secrets
+frontend/.env
