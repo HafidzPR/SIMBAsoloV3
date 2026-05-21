@@ -5,6 +5,8 @@ import { RecognizerPage } from "./pages/RecognizerPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { DictionaryPage } from "./pages/DictionaryPage";
+import { AccuracyTestPage } from "./pages/AccuracyTestPage";
+import { AboutPage } from "./pages/AboutPage";
 import { AdminLoginPage } from "./pages/AdminLoginPage";
 import { AdminRegisterPage } from "./pages/AdminRegisterPage";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
@@ -18,17 +20,14 @@ export interface RecentSentence {
 
 export default function App() {
   const [recentSentences, setRecentSentences] = useState<RecentSentence[]>([]);
-  const [theme, setTheme] = useState<string>(() => {
-    return localStorage.getItem("simba-theme") || "dark";
-  });
+  const [theme, setTheme] = useState<string>(
+    () => localStorage.getItem("simba-theme") || "dark",
+  );
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === "light") {
-      root.setAttribute("data-theme", "light");
-    } else {
-      root.removeAttribute("data-theme");
-    }
+    if (theme === "light") root.setAttribute("data-theme", "light");
+    else root.removeAttribute("data-theme");
     localStorage.setItem("simba-theme", theme);
   }, [theme]);
 
@@ -66,6 +65,8 @@ export default function App() {
             />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/dictionary" element={<DictionaryPage />} />
+            <Route path="/test" element={<AccuracyTestPage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route
               path="/settings"
               element={<SettingsPage theme={theme} setTheme={setTheme} />}

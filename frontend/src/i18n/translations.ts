@@ -9,6 +9,8 @@ export const translations = {
   "nav.dashboard": { en: "Dashboard", id: "Dasbor" },
   "nav.admin": { en: "Admin", id: "Admin" },
   "nav.logout": { en: "Logout", id: "Keluar" },
+  "nav.test": { en: "Test", id: "Uji" },
+  "nav.about": { en: "About", id: "Tentang" },
 
   // ── Recognizer page ───────────────────────────────────────────────────────
   "rec.liveDetection": { en: "LIVE DETECTION", id: "DETEKSI LANGSUNG" },
@@ -44,6 +46,20 @@ export const translations = {
   "rec.translating": { en: "TRANSLATING...", id: "MENERJEMAHKAN..." },
   "rec.done": { en: "DONE", id: "SELESAI" },
 
+  // ── Session summary modal ─────────────────────────────────────────────────
+  "sess.title": { en: "Session Summary", id: "Ringkasan Sesi" },
+  "sess.duration": { en: "Duration", id: "Durasi" },
+  "sess.lettersDetected": { en: "Letters Detected", id: "Huruf Terdeteksi" },
+  "sess.avgConfidence": { en: "Avg Confidence", id: "Kepercayaan Rata-rata" },
+  "sess.topLetter": { en: "Most Signed Letter", id: "Huruf Paling Sering" },
+  "sess.wordBuilt": { en: "Word Built", id: "Kata Dibuat" },
+  "sess.noActivity": {
+    en: "No signs detected this session.",
+    id: "Tidak ada isyarat terdeteksi sesi ini.",
+  },
+  "sess.close": { en: "Close", id: "Tutup" },
+  "sess.seconds": { en: "sec", id: "dtk" },
+
   // ── Status messages ───────────────────────────────────────────────────────
   "status.starting": { en: "Starting...", id: "Memulai..." },
   "status.awaitingHand": { en: "Awaiting hand...", id: "Menunggu tangan..." },
@@ -72,6 +88,7 @@ export const translations = {
     id: "{s} kalimat tersimpan · {l} prediksi huruf",
   },
   "hist.refresh": { en: "↻ Refresh", id: "↻ Segarkan" },
+  "hist.export": { en: "⬇ Export CSV", id: "⬇ Ekspor CSV" },
   "hist.filter": { en: "Filter...", id: "Filter..." },
   "hist.savedSentences": { en: "Saved Sentences", id: "Kalimat Tersimpan" },
   "hist.letterPredictions": { en: "Letter Predictions", id: "Prediksi Huruf" },
@@ -104,6 +121,7 @@ export const translations = {
   "hist.session": { en: "Session", id: "Sesi" },
   "hist.letters": { en: "letters", id: "huruf" },
   "hist.avg": { en: "avg", id: "rata-rata" },
+  "hist.confidence": { en: "Confidence Trend", id: "Tren Kepercayaan" },
 
   // ── Dictionary page ───────────────────────────────────────────────────────
   "dict.title": { en: "SIBI Dictionary", id: "Kamus SIBI" },
@@ -310,6 +328,117 @@ export const translations = {
     en: "Delete all saved sentences?",
     id: "Hapus semua kalimat tersimpan?",
   },
+
+  // ── Accuracy Test page ────────────────────────────────────────────────────
+  "test.title": { en: "Accuracy Test", id: "Uji Akurasi" },
+  "test.subtitle": {
+    en: "Test the ML model's recognition accuracy across all 26 SIBI letters",
+    id: "Uji akurasi pengenalan model ML untuk 26 huruf SIBI",
+  },
+  "test.howItWorks": { en: "HOW THE TEST WORKS", id: "CARA KERJA PENGUJIAN" },
+  "test.howDesc": {
+    en: "The system will prompt you to sign each letter one by one. Hold each sign steadily until it is confirmed. The test records whether each detection was correct or incorrect.",
+    id: "Sistem akan meminta Anda mengisyaratkan setiap huruf satu per satu. Tahan setiap isyarat sampai dikonfirmasi. Pengujian mencatat apakah deteksi benar atau salah.",
+  },
+  "test.startTest": { en: "Start Accuracy Test", id: "Mulai Uji Akurasi" },
+  "test.stopTest": { en: "Stop Test", id: "Hentikan Pengujian" },
+  "test.signThis": { en: "Sign this letter:", id: "Isyaratkan huruf ini:" },
+  "test.detected": { en: "Detected:", id: "Terdeteksi:" },
+  "test.correct": { en: "✓ Correct", id: "✓ Benar" },
+  "test.incorrect": { en: "✗ Incorrect", id: "✗ Salah" },
+  "test.skip": { en: "Skip", id: "Lewati" },
+  "test.next": { en: "Next Letter →", id: "Huruf Berikutnya →" },
+  "test.progress": { en: "Progress", id: "Kemajuan" },
+  "test.results": { en: "Test Results", id: "Hasil Pengujian" },
+  "test.accuracy": { en: "Overall Accuracy", id: "Akurasi Keseluruhan" },
+  "test.correct_count": { en: "Correct", id: "Benar" },
+  "test.incorrect_count": { en: "Incorrect", id: "Salah" },
+  "test.skipped": { en: "Skipped", id: "Dilewati" },
+  "test.perLetter": { en: "PER-LETTER RESULTS", id: "HASIL PER HURUF" },
+  "test.retake": { en: "Retake Test", id: "Ulangi Pengujian" },
+  "test.exportResults": { en: "⬇ Export Results", id: "⬇ Ekspor Hasil" },
+  "test.noCamera": {
+    en: "Camera is required for accuracy testing.",
+    id: "Kamera diperlukan untuk pengujian akurasi.",
+  },
+  "test.avgConf": { en: "Avg Confidence", id: "Kepercayaan Rata-rata" },
+  "test.completed": { en: "Test completed!", id: "Pengujian selesai!" },
+  "test.waitingSign": { en: "Waiting for sign...", id: "Menunggu isyarat..." },
+  "test.confirmed": { en: "Confirmed!", id: "Dikonfirmasi!" },
+
+  // ── About page ────────────────────────────────────────────────────────────
+  "about.title": { en: "About SIMBAsoloV3", id: "Tentang SIMBAsoloV3" },
+  "about.subtitle": {
+    en: "Sign Language Translation System",
+    id: "Sistem Penerjemah Bahasa Isyarat",
+  },
+  "about.whatTitle": { en: "What is SIMBAsoloV3?", id: "Apa itu SIMBAsoloV3?" },
+  "about.whatDesc": {
+    en: "SIMBAsoloV3 is a real-time Indonesian Sign Language (SIBI) recognition system designed to facilitate communication between hearing-impaired individuals and cashier staff. It uses a Convolutional Neural Network (CNN) with MobileNet architecture to detect and translate hand signs captured through a webcam.",
+    id: "SIMBAsoloV3 adalah sistem pengenalan Bahasa Isyarat Indonesia (SIBI) secara real-time yang dirancang untuk memfasilitasi komunikasi antara individu dengan gangguan pendengaran dan kasir toko. Sistem ini menggunakan Jaringan Saraf Konvolusional (CNN) dengan arsitektur MobileNet untuk mendeteksi dan menerjemahkan isyarat tangan melalui webcam.",
+  },
+  "about.sibiTitle": { en: "What is SIBI?", id: "Apa itu SIBI?" },
+  "about.sibiDesc": {
+    en: "SIBI (Sistem Isyarat Bahasa Indonesia) is the standardized Indonesian Sign Language system. It consists of a manual alphabet of 26 hand signs corresponding to letters A through Z, used by the deaf and hard-of-hearing community in Indonesia.",
+    id: "SIBI (Sistem Isyarat Bahasa Indonesia) adalah sistem bahasa isyarat Indonesia yang terstandarisasi. Terdiri dari abjad manual 26 isyarat tangan yang sesuai dengan huruf A hingga Z, digunakan oleh komunitas tuli dan tunarungu di Indonesia.",
+  },
+  "about.howUseTitle": { en: "How to Use", id: "Cara Penggunaan" },
+  "about.howUse1": {
+    en: "Click Start Camera on the Recognizer page to activate the webcam.",
+    id: "Klik Mulai Kamera di halaman Penerjemah untuk mengaktifkan webcam.",
+  },
+  "about.howUse2": {
+    en: "Position your hand clearly in front of the camera.",
+    id: "Posisikan tangan Anda dengan jelas di depan kamera.",
+  },
+  "about.howUse3": {
+    en: "Sign each letter — hold it steady for a moment until it is confirmed.",
+    id: "Isyaratkan setiap huruf — tahan sejenak hingga dikonfirmasi.",
+  },
+  "about.howUse4": {
+    en: "Letters are added to the Word Builder automatically.",
+    id: "Huruf ditambahkan ke Pembuat Kata secara otomatis.",
+  },
+  "about.howUse5": {
+    en: "Press Save Sentence to store the completed word or phrase.",
+    id: "Tekan Simpan Kalimat untuk menyimpan kata atau frasa yang selesai.",
+  },
+  "about.howUse6": {
+    en: "Press ▶ Speak to have the text read aloud.",
+    id: "Tekan ▶ Bicara agar teks dibacakan dengan suara.",
+  },
+  "about.tipsTitle": {
+    en: "Tips for Best Results",
+    id: "Tips untuk Hasil Terbaik",
+  },
+  "about.tip1": {
+    en: "Ensure good lighting — avoid backlight from windows behind you.",
+    id: "Pastikan pencahayaan baik — hindari cahaya dari jendela di belakang Anda.",
+  },
+  "about.tip2": {
+    en: "Keep your hand fully visible within the camera frame.",
+    id: "Pastikan tangan Anda sepenuhnya terlihat dalam bingkai kamera.",
+  },
+  "about.tip3": {
+    en: "Hold each sign steady for at least 1 second for best detection.",
+    id: "Tahan setiap isyarat minimal 1 detik untuk deteksi terbaik.",
+  },
+  "about.tip4": {
+    en: "Use the SIBI Dictionary page as a reference for correct hand shapes.",
+    id: "Gunakan halaman Kamus SIBI sebagai referensi bentuk tangan yang benar.",
+  },
+  "about.tip5": {
+    en: "If confidence is low, try adjusting your hand position or lighting.",
+    id: "Jika kepercayaan rendah, coba sesuaikan posisi tangan atau pencahayaan.",
+  },
+  "about.devTitle": { en: "Developer Information", id: "Informasi Pengembang" },
+  "about.capstoneTitle": { en: "Capstone Project", id: "Proyek Capstone" },
+  "about.techTitle": { en: "Technology Stack", id: "Teknologi yang Digunakan" },
+  "about.version": { en: "Version", id: "Versi" },
+  "about.frontend": { en: "Frontend", id: "Frontend" },
+  "about.backend": { en: "Backend", id: "Backend" },
+  "about.mlService": { en: "ML Service", id: "Layanan ML" },
+  "about.database": { en: "Database", id: "Basis Data" },
 
   // ── Shared ────────────────────────────────────────────────────────────────
   "common.loading": { en: "Loading...", id: "Memuat..." },

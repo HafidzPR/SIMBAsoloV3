@@ -26,6 +26,22 @@ function speak(text: string) {
   window.speechSynthesis.speak(utt);
 }
 
+function exportCSV(letters: HistoryItem[]) {
+  const header = "ID,Letter,Confidence,Timestamp,Session";
+  const rows = letters.map(
+    (r) =>
+      `${r.id},${r.letter},${Math.round(r.confidence * 100)}%,${r.timestamp},${r.session_id}`,
+  );
+  const csv = [header, ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `simba_history_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function HistoryPage() {
   const { t } = useLang();
   const [tab, setTab] = useState<Tab>("sentences");
@@ -155,14 +171,23 @@ export function HistoryPage() {
       ) : tab === "sentences" ? (
         <div>
           <div className="history-tab-header">
-            <p className="history-tab-desc">{t("hist.sentencesDesc")}</p>
-            <button
-              className="btn-danger"
-              onClick={handleClearSentences}
-              disabled={sentences.length === 0}
-            >
-              {t("hist.clearSentences")}
-            </button>
+            <p className="history-tab-desc">{t("hist.lettersDesc")}</p>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                className="btn-secondary"
+                onClick={() => exportCSV(letters)}
+                disabled={letters.length === 0}
+              >
+                {t("hist.export")}
+              </button>
+              <button
+                className="btn-danger"
+                onClick={handleClearLetters}
+                disabled={letters.length === 0}
+              >
+                {t("hist.clearLetters")}
+              </button>
+            </div>
           </div>
           {filteredSentences.length === 0 ? (
             <div className="empty-state">
@@ -245,6 +270,24 @@ export function HistoryPage() {
                         <span className="session-avgconf">
                           {t("hist.avg")} {avgConf}%
                         </span>
+                        <svg
+                          className="sparkline"
+                          viewBox={`0 0 ${rows.length * 6} 24`}
+                          width={rows.length * 6}
+                          height={24}
+                        >
+                          <polyline
+                            fill="none"
+                            stroke="var(--accent)"
+                            strokeWidth="1.5"
+                            points={rows
+                              .map(
+                                (r, i) =>
+                                  `${i * 6},${24 - Math.round(r.confidence * 22)}`,
+                              )
+                              .join(" ")}
+                          />
+                        </svg>
                         <span className="session-meta">
                           {earliest ? new Date(earliest).toLocaleString() : ""}
                         </span>

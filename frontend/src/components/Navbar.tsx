@@ -18,6 +18,8 @@ export function Navbar() {
     { to: "/", label: t("nav.recognizer") },
     { to: "/history", label: t("nav.history") },
     { to: "/dictionary", label: t("nav.dictionary") },
+    { to: "/test", label: t("nav.test") },
+    { to: "/about", label: t("nav.about") },
     { to: "/settings", label: t("nav.settings") },
   ];
 
@@ -46,7 +48,6 @@ export function Navbar() {
       </div>
 
       <div className="navbar-right">
-        {/* Language toggle */}
         <div className="lang-toggle">
           <button
             className={`lang-btn${lang === "en" ? " lang-btn--active" : ""}`}
@@ -63,7 +64,6 @@ export function Navbar() {
             🇮🇩
           </button>
         </div>
-
         {isAdmin ? (
           <>
             <NavLink
