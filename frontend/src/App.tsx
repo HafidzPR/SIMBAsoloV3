@@ -5,7 +5,6 @@ import { RecognizerPage } from "./pages/RecognizerPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { DictionaryPage } from "./pages/DictionaryPage";
-import { AccuracyTestPage } from "./pages/AccuracyTestPage";
 import { AboutPage } from "./pages/AboutPage";
 import { AdminLoginPage } from "./pages/AdminLoginPage";
 import { AdminRegisterPage } from "./pages/AdminRegisterPage";
@@ -65,7 +64,6 @@ export default function App() {
             />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/dictionary" element={<DictionaryPage />} />
-            <Route path="/test" element={<AccuracyTestPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route
               path="/settings"

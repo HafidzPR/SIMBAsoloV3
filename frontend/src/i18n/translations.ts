@@ -337,8 +337,8 @@ export const translations = {
   },
   "test.howItWorks": { en: "HOW THE TEST WORKS", id: "CARA KERJA PENGUJIAN" },
   "test.howDesc": {
-    en: "The system will prompt you to sign each letter one by one. Hold each sign steadily until it is confirmed. The test records whether each detection was correct or incorrect.",
-    id: "Sistem akan meminta Anda mengisyaratkan setiap huruf satu per satu. Tahan setiap isyarat sampai dikonfirmasi. Pengujian mencatat apakah deteksi benar atau salah.",
+    en: "Sign each letter shown. Hold the sign steady — after ~1 second of correct detection the app confirms it automatically. Then remove your hand from the frame completely before signing the next letter.",
+    id: "Isyaratkan setiap huruf yang ditampilkan. Tahan isyarat — setelah ~1 detik deteksi benar, aplikasi mengkonfirmasi otomatis. Kemudian jauhkan tangan dari kamera sebelum mengisyaratkan huruf berikutnya.",
   },
   "test.startTest": { en: "Start Accuracy Test", id: "Mulai Uji Akurasi" },
   "test.stopTest": { en: "Stop Test", id: "Hentikan Pengujian" },

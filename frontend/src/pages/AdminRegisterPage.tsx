@@ -39,7 +39,7 @@ export function AdminRegisterPage() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-logo">S</div>
+          <img src="/logo.png" alt="SIMBAsoloV3" className="auth-logo-img" />
           <h1 className="auth-title">{t("auth.registerTitle")}</h1>
           <p className="auth-subtitle">{t("auth.registerSubtitle")}</p>
         </div>

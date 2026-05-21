@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { adminLogout } from "../api/client";
 import { useLang } from "../i18n/LanguageContext";
@@ -7,6 +8,7 @@ export function Navbar() {
   const { lang, setLang, t } = useLang();
   const adminInfo = localStorage.getItem("simba_admin_info");
   const isAdmin = !!adminInfo;
+  const [showSplash, setShowSplash] = useState(false);
 
   const handleLogout = async () => {
     await adminLogout();
@@ -18,77 +20,204 @@ export function Navbar() {
     { to: "/", label: t("nav.recognizer") },
     { to: "/history", label: t("nav.history") },
     { to: "/dictionary", label: t("nav.dictionary") },
-    { to: "/test", label: t("nav.test") },
     { to: "/about", label: t("nav.about") },
     { to: "/settings", label: t("nav.settings") },
   ];
 
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">
-        <span className="navbar-badge">S</span>
-        <span className="navbar-title">
-          SIMBA<em>soloV3</em>
-        </span>
-      </div>
-
-      <div className="navbar-links">
-        {links.map(({ to, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end
-            className={({ isActive }) =>
-              `navbar-link${isActive ? " navbar-link--active" : ""}`
-            }
-          >
-            {label}
-          </NavLink>
-        ))}
-      </div>
-
-      <div className="navbar-right">
-        <div className="lang-toggle">
-          <button
-            className={`lang-btn${lang === "en" ? " lang-btn--active" : ""}`}
-            onClick={() => setLang("en")}
-            title="English"
-          >
-            🇬🇧
-          </button>
-          <button
-            className={`lang-btn${lang === "id" ? " lang-btn--active" : ""}`}
-            onClick={() => setLang("id")}
-            title="Bahasa Indonesia"
-          >
-            🇮🇩
-          </button>
+    <>
+      <nav className="navbar">
+        <div
+          className="navbar-brand"
+          onClick={() => setShowSplash(true)}
+          style={{ cursor: "pointer" }}
+        >
+          <img src="/logo.png" alt="SIMBAsoloV3 logo" className="navbar-logo" />
+          <span className="navbar-title">
+            SIMBA<em>soloV3</em>
+          </span>
         </div>
-        {isAdmin ? (
-          <>
+
+        <div className="navbar-links">
+          {links.map(({ to, label }) => (
             <NavLink
-              to="/admin/dashboard"
+              key={to}
+              to={to}
+              end
               className={({ isActive }) =>
                 `navbar-link${isActive ? " navbar-link--active" : ""}`
               }
             >
-              {t("nav.dashboard")}
+              {label}
             </NavLink>
-            <button className="navbar-admin-badge" onClick={handleLogout}>
-              {JSON.parse(adminInfo!).username} · {t("nav.logout")}
+          ))}
+        </div>
+
+        <div className="navbar-right">
+          <div className="lang-toggle">
+            <button
+              className={`lang-btn${lang === "en" ? " lang-btn--active" : ""}`}
+              onClick={() => setLang("en")}
+              title="English"
+            >
+              🇬🇧
             </button>
-          </>
-        ) : (
-          <NavLink
-            to="/admin/login"
-            className={({ isActive }) =>
-              `navbar-link${isActive ? " navbar-link--active" : ""}`
-            }
-          >
-            {t("nav.admin")}
-          </NavLink>
-        )}
-      </div>
-    </nav>
+            <button
+              className={`lang-btn${lang === "id" ? " lang-btn--active" : ""}`}
+              onClick={() => setLang("id")}
+              title="Bahasa Indonesia"
+            >
+              🇮🇩
+            </button>
+          </div>
+          {isAdmin ? (
+            <>
+              <NavLink
+                to="/admin/dashboard"
+                className={({ isActive }) =>
+                  `navbar-link${isActive ? " navbar-link--active" : ""}`
+                }
+              >
+                {t("nav.dashboard")}
+              </NavLink>
+              <button className="navbar-admin-badge" onClick={handleLogout}>
+                {JSON.parse(adminInfo!).username} · {t("nav.logout")}
+              </button>
+            </>
+          ) : (
+            <NavLink
+              to="/admin/login"
+              className={({ isActive }) =>
+                `navbar-link${isActive ? " navbar-link--active" : ""}`
+              }
+            >
+              {t("nav.admin")}
+            </NavLink>
+          )}
+        </div>
+      </nav>
+
+      {/* ── Splash Modal ──────────────────────────────────────────────── */}
+      {showSplash && (
+        <div className="splash-overlay" onClick={() => setShowSplash(false)}>
+          <div className="splash-modal" onClick={(e) => e.stopPropagation()}>
+            {/* Close */}
+            <button
+              className="splash-close"
+              onClick={() => setShowSplash(false)}
+            >
+              ✕
+            </button>
+
+            {/* Hero */}
+            <div className="splash-hero">
+              <img src="/logo.png" alt="SIMBAsoloV3" className="splash-logo" />
+              <div className="splash-hero-text">
+                <h1 className="splash-title">SIMBAsoloV3</h1>
+                <p className="splash-tagline">
+                  {lang === "id"
+                    ? "Sistem Penerjemah Isyarat Bahasa Indonesia Real-Time"
+                    : "Real-Time Indonesian Sign Language Translation System"}
+                </p>
+              </div>
+            </div>
+
+            <div className="splash-divider" />
+
+            {/* Description */}
+            <p className="splash-desc">
+              {lang === "id"
+                ? "Aplikasi berbasis kamera yang mendeteksi dan menerjemahkan isyarat abjad SIBI (A–Z) secara real-time menggunakan Jaringan Saraf Konvolusional dengan arsitektur MobileNet."
+                : "A camera-based application that detects and translates SIBI alphabet signs (A–Z) in real-time using a Convolutional Neural Network with MobileNet architecture."}
+            </p>
+
+            {/* Feature pills */}
+            <div className="splash-pills">
+              {(lang === "id"
+                ? [
+                    "🤖 CNN MobileNet",
+                    "✋ MediaPipe",
+                    "⚡ Real-Time",
+                    "🗣️ Text-to-Speech",
+                    "📖 Kamus SIBI",
+                    "📊 Uji Akurasi",
+                    "🌐 EN / ID",
+                    "🔐 Admin Panel",
+                  ]
+                : [
+                    "🤖 CNN MobileNet",
+                    "✋ MediaPipe",
+                    "⚡ Real-Time",
+                    "🗣️ Text-to-Speech",
+                    "📖 SIBI Dictionary",
+                    "📊 Accuracy Test",
+                    "🌐 EN / ID",
+                    "🔐 Admin Panel",
+                  ]
+              ).map((pill) => (
+                <span key={pill} className="splash-pill">
+                  {pill}
+                </span>
+              ))}
+            </div>
+
+            <div className="splash-divider" />
+
+            {/* How to use */}
+            <div className="splash-steps">
+              <p className="splash-section-label">
+                {lang === "id" ? "CARA PENGGUNAAN" : "HOW TO USE"}
+              </p>
+              <div className="splash-step-list">
+                {(lang === "id"
+                  ? [
+                      "Klik Mulai Kamera di halaman Penerjemah",
+                      "Tunjukkan isyarat tangan SIBI ke kamera",
+                      "Huruf terkonfirmasi otomatis masuk ke Pembuat Kata",
+                      "Tekan Simpan Kalimat lalu ▶ Bicara untuk membacakannya",
+                    ]
+                  : [
+                      "Click Start Camera on the Recognizer page",
+                      "Show SIBI hand signs to the camera",
+                      "Confirmed letters are added to the Word Builder automatically",
+                      "Press Save Sentence then ▶ Speak to read it aloud",
+                    ]
+                ).map((step, i) => (
+                  <div key={i} className="splash-step">
+                    <span className="splash-step-num">{i + 1}</span>
+                    <span>{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="splash-divider" />
+
+            {/* Dev info */}
+            <div className="splash-dev">
+              <div className="splash-dev-row">
+                <span className="splash-dev-label">Developer</span>
+                <span className="splash-dev-value">Hafidz Putra Rachman</span>
+              </div>
+              <div className="splash-dev-row">
+                <span className="splash-dev-label">University</span>
+                <span className="splash-dev-value">Universitas Diponegoro</span>
+              </div>
+              <div className="splash-dev-row">
+                <span className="splash-dev-label">Stack</span>
+                <span className="splash-dev-value">
+                  React · FastAPI · TensorFlow · SQLite
+                </span>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <button className="splash-cta" onClick={() => setShowSplash(false)}>
+              {lang === "id" ? "Mulai Menggunakan →" : "Get Started →"}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
