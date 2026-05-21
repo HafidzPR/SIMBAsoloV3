@@ -1,6 +1,39 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from datetime import datetime
 from . import models
+from .auth import hash_password
+
+
+# ── Admin ─────────────────────────────────────────────────────────────────────
+def get_admin_by_username(db: Session, username: str):
+    return db.query(models.Admin).filter(
+        models.Admin.username == username
+    ).first()
+
+
+def get_admin_by_email(db: Session, email: str):
+    return db.query(models.Admin).filter(
+        models.Admin.email == email
+    ).first()
+
+
+def create_admin(db: Session, username: str, email: str, password: str):
+    admin = models.Admin(
+        username=username,
+        email=email,
+        password_hash=hash_password(password),
+        is_active=True,
+        created_at=datetime.now(),
+    )
+    db.add(admin)
+    db.commit()
+    db.refresh(admin)
+    return admin
+
+
+def count_admins(db: Session) -> int:
+    return db.query(models.Admin).count()
 
 
 # ── Prediction history ────────────────────────────────────────────────────────
@@ -33,6 +66,29 @@ def clear_history(db: Session):
     return count
 
 
+def get_history_stats(db: Session):
+    total = db.query(models.PredictionHistory).count()
+    sessions = db.query(
+        func.count(func.distinct(models.PredictionHistory.session_id))
+    ).scalar()
+    avg_conf = db.query(func.avg(models.PredictionHistory.confidence)).scalar()
+    top_letter = (
+        db.query(
+            models.PredictionHistory.letter,
+            func.count(models.PredictionHistory.letter).label("cnt"),
+        )
+        .group_by(models.PredictionHistory.letter)
+        .order_by(func.count(models.PredictionHistory.letter).desc())
+        .first()
+    )
+    return {
+        "total_predictions": total,
+        "total_sessions": sessions or 0,
+        "avg_confidence": round(float(avg_conf or 0), 4),
+        "top_letter": top_letter[0] if top_letter else "—",
+    }
+
+
 # ── Saved sentences ───────────────────────────────────────────────────────────
 def save_sentence(db: Session, text: str, session_id: str):
     row = models.SavedSentence(
@@ -59,6 +115,10 @@ def clear_sentences(db: Session):
     return count
 
 
+def get_sentence_count(db: Session) -> int:
+    return db.query(models.SavedSentence).count()
+
+
 # ── Settings ──────────────────────────────────────────────────────────────────
 DEFAULT_SETTINGS = [
     {
@@ -80,6 +140,11 @@ DEFAULT_SETTINGS = [
         "key": "model_version",
         "value": "model_SIBI.h5",
         "label": "Active model filename (informational only)",
+    },
+    {
+        "key": "display_font_size",
+        "value": "28",
+        "label": "Font size (px) for the Word Builder translation display",
     },
 ]
 
@@ -109,3 +174,16 @@ def update_setting(db: Session, key: str, value: str):
         db.commit()
         db.refresh(row)
     return row
+
+def get_letter_frequency(db: Session) -> list:
+    """Returns letter frequency for the admin stats chart."""
+    results = (
+        db.query(
+            models.PredictionHistory.letter,
+            func.count(models.PredictionHistory.letter).label("count"),
+        )
+        .group_by(models.PredictionHistory.letter)
+        .order_by(func.count(models.PredictionHistory.letter).desc())
+        .all()
+    )
+    return [{"letter": r.letter, "count": r.count} for r in results]

@@ -31,12 +31,12 @@ echo  %ESC%[94m[STARTING] Launching ML Service...%ESC%[0m
 start "SIMBA_ML" cmd /k "title SIMBA_ML && call C:\Users\hafid\anaconda3\Scripts\activate.bat simba_v3 && cd /d C:\CAPSTONE_Codes\SIMBAsoloV3\ml-service && uvicorn main:app --port 8001 --reload"
 
 echo  %ESC%[94m[STARTING] Launching Backend...%ESC%[0m
-start "SIMBA_BACKEND" cmd /k "title SIMBA_BACKEND && call C:\Users\hafid\anaconda3\Scripts\activate.bat simba_v3 && cd /d C:\CAPSTONE_Codes\SIMBAsoloV3 && del simba.db && uvicorn backend.main:app --port 8000 --reload"
+start "SIMBA_BACKEND" cmd /k "title SIMBA_BACKEND && call C:\Users\hafid\anaconda3\Scripts\activate.bat simba_v3 && cd /d C:\CAPSTONE_Codes\SIMBAsoloV3 && uvicorn backend.main:app --port 8000 --reload"
 
 echo  %ESC%[94m[STARTING] Launching Frontend...%ESC%[0m
 start "SIMBA_FRONTEND" cmd /k "title SIMBA_FRONTEND && cd /d C:\CAPSTONE_Codes\SIMBAsoloV3\frontend && npm run dev"
 
-:: 4. Wait & Browser Launch
+:: Wait & Browser Launch
 echo.
 echo  %ESC%[96m[WAIT] Loading application components (15s)...%ESC%[0m
 timeout /t 15 /nobreak >nul
@@ -58,7 +58,6 @@ pause >nul
 echo.
 echo  %ESC%[91m[SHUTDOWN] Force terminating service windows...%ESC%[0m
 
-:: We check for window titles containing SIMBA_
 taskkill /F /FI "WINDOWTITLE eq SIMBA_ML*" /IM cmd.exe /T >nul 2>&1
 taskkill /F /FI "WINDOWTITLE eq SIMBA_BACKEND*" /IM cmd.exe /T >nul 2>&1
 taskkill /F /FI "WINDOWTITLE eq SIMBA_FRONTEND*" /IM cmd.exe /T >nul 2>&1

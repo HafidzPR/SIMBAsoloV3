@@ -1,13 +1,15 @@
 import os
 import httpx
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import Optional
 from pydantic import BaseModel
+from datetime import datetime
 
 from . import crud, models, schemas
 from .database import engine, get_db
+from .auth import verify_password, create_session, get_admin_by_token, delete_session
 
 ML_SERVICE_URL = os.getenv("ML_SERVICE_URL", "http://localhost:8001")
 
@@ -29,9 +31,88 @@ def on_startup():
     crud.seed_settings(db)
 
 
+# ── Auth helpers ──────────────────────────────────────────────────────────────
+def require_admin(
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+):
+    token = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ", 1)[1]
+    admin = get_admin_by_token(db, token)
+    if not admin:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return admin
+
+
+# ── Health ────────────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+# ── Admin Auth ────────────────────────────────────────────────────────────────
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+@app.post("/admin/register")
+def register(req: RegisterRequest, db: Session = Depends(get_db)):
+    if crud.get_admin_by_username(db, req.username):
+        raise HTTPException(status_code=400, detail="Username already taken")
+    if crud.get_admin_by_email(db, req.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    admin = crud.create_admin(db, req.username, req.email, req.password)
+    return {"id": admin.id, "username": admin.username, "email": admin.email}
+
+
+@app.post("/admin/login")
+def login(req: LoginRequest, db: Session = Depends(get_db)):
+    admin = crud.get_admin_by_username(db, req.username)
+    if not admin or not verify_password(req.password, admin.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    token = create_session(db, admin.id)
+    return {
+        "token": token,
+        "admin": {"id": admin.id, "username": admin.username, "email": admin.email},
+    }
+
+
+@app.post("/admin/logout")
+def logout(
+    authorization: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+):
+    token = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ", 1)[1]
+    if token:
+        delete_session(db, token)
+    return {"status": "logged out"}
+
+
+@app.get("/admin/me")
+def me(admin=Depends(require_admin)):
+    return {"id": admin.id, "username": admin.username, "email": admin.email}
+
+
+# ── Admin Stats ───────────────────────────────────────────────────────────────
+@app.get("/admin/stats")
+def stats(admin=Depends(require_admin), db: Session = Depends(get_db)):
+    history_stats = crud.get_history_stats(db)
+    sentence_count = crud.get_sentence_count(db)
+    return {**history_stats, "total_sentences": sentence_count}
+
+@app.get("/admin/letter-frequency")
+def letter_frequency(admin=Depends(require_admin), db: Session = Depends(get_db)):
+    return crud.get_letter_frequency(db)
 
 
 # ── Predict ───────────────────────────────────────────────────────────────────
@@ -74,7 +155,7 @@ async def predict(req: schemas.PredictRequest, db: Session = Depends(get_db)):
     )
 
 
-# ── Prediction history ────────────────────────────────────────────────────────
+# ── History ───────────────────────────────────────────────────────────────────
 @app.get("/history")
 def get_history(
     skip: int = 0,
@@ -101,7 +182,7 @@ def clear_history(db: Session = Depends(get_db)):
     return {"deleted": count}
 
 
-# ── Saved sentences ───────────────────────────────────────────────────────────
+# ── Sentences ─────────────────────────────────────────────────────────────────
 class SaveSentenceRequest(BaseModel):
     text: str
     session_id: str

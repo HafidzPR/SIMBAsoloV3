@@ -4,6 +4,10 @@ import { Navbar } from "./components/Navbar";
 import { RecognizerPage } from "./pages/RecognizerPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { DictionaryPage } from "./pages/DictionaryPage";
+import { AdminLoginPage } from "./pages/AdminLoginPage";
+import { AdminRegisterPage } from "./pages/AdminRegisterPage";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { postSentence } from "./api/client";
 
 export interface RecentSentence {
@@ -14,13 +18,10 @@ export interface RecentSentence {
 
 export default function App() {
   const [recentSentences, setRecentSentences] = useState<RecentSentence[]>([]);
-
-  // Theme lives only in localStorage — no backend dependency
   const [theme, setTheme] = useState<string>(() => {
     return localStorage.getItem("simba-theme") || "dark";
   });
 
-  // Keep the HTML data-theme attribute in sync
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "light") {
@@ -44,7 +45,7 @@ export default function App() {
     try {
       await postSentence(text.trim(), sessionIdRef.current);
     } catch (e) {
-      console.error("Failed to save sentence to backend:", e);
+      console.error("Failed to save sentence:", e);
     }
   };
 
@@ -64,10 +65,14 @@ export default function App() {
               }
             />
             <Route path="/history" element={<HistoryPage />} />
+            <Route path="/dictionary" element={<DictionaryPage />} />
             <Route
               path="/settings"
               element={<SettingsPage theme={theme} setTheme={setTheme} />}
             />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/register" element={<AdminRegisterPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           </Routes>
         </div>
       </div>

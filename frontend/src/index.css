@@ -1167,3 +1167,856 @@ body {
   color: var(--text-muted);
   flex-shrink: 0;
 }
+/* ── Navbar right section ────────────────────────────────────────────────── */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.navbar-admin-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-text);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-dim);
+  border-radius: 100px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.navbar-admin-badge:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Auth pages ──────────────────────────────────────────────────────────── */
+.auth-page {
+  min-height: calc(100vh - var(--navbar-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.auth-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+}
+.auth-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.auth-logo {
+  width: 48px;
+  height: 48px;
+  background: var(--accent);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 22px;
+  color: #fff;
+  margin: 0 auto 16px;
+}
+.auth-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.auth-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.auth-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.auth-input {
+  background: var(--bg-base);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.auth-input:focus {
+  border-color: var(--accent);
+}
+.auth-btn {
+  padding: 12px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-top: 4px;
+}
+.auth-btn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+.auth-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.auth-footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.auth-link {
+  color: var(--accent-text);
+  text-decoration: none;
+}
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Admin Dashboard ─────────────────────────────────────────────────────── */
+.admin-dashboard {
+}
+.dash-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.dash-stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+.dash-stat-value {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--accent-text);
+  line-height: 1;
+}
+.dash-stat-letter {
+  font-size: 48px;
+}
+.dash-stat-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Dictionary page ─────────────────────────────────────────────────────── */
+.dictionary-page {
+}
+.dict-desc {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.dict-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.dict-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    transform 0.1s;
+}
+.dict-card:hover {
+  border-color: var(--border-lit);
+  background: var(--bg-raised);
+  transform: translateY(-2px);
+}
+.dict-card--active {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.dict-card-img-wrap {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 10px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dict-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dict-card-placeholder {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--accent-text);
+}
+.dict-card-letter {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-text);
+  margin-bottom: 4px;
+}
+.dict-card-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.dict-instructions {
+  background: var(--bg-raised);
+  border: 1px solid var(--border-dim);
+  border-left: 3px solid var(--accent-dim);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+}
+/* ── Dictionary modal ────────────────────────────────────────────────────── */
+.dict-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.dict-modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 520px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.dict-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dict-modal-letter {
+  font-family: var(--font-mono);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent-text);
+  line-height: 1;
+}
+.dict-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+.dict-modal-close:hover {
+  color: var(--red);
+  background: var(--red-dim);
+}
+.dict-modal-img-wrap {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+.dict-modal-img {
+  width: 100%;
+  height: auto;
+  max-height: 480px;
+  object-fit: contain;
+  display: block;
+}
+.dict-modal-placeholder {
+  font-family: var(--font-mono);
+  font-size: 120px;
+  font-weight: 700;
+  color: var(--accent-text);
+  opacity: 0.3;
+  padding: 40px;
+}
+.dict-modal-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  text-align: center;
+}
+.dict-modal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border-dim);
+  padding-top: 16px;
+}
+.dict-modal-nav-btn {
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-mid);
+  background: var(--bg-raised);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+.dict-modal-nav-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+.dict-modal-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.dict-modal-nav-pos {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+/* ── Status scanning overlay variants ───────────────────────────────────── */
+.cam-scanning--busy {
+  color: var(--amber, #fbbf24);
+  animation: scan-pulse 0.6s ease-in-out infinite;
+}
+.cam-scanning--translating {
+  color: var(--green);
+  animation: scan-pulse 0.4s ease-in-out infinite;
+}
+.cam-scanning--done {
+  color: var(--green);
+  animation: none;
+  opacity: 1;
+}
+
+/* Status dot error + busy variants */
+.status-dot--error {
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+}
+.status-dot--busy {
+  background: var(--accent-text);
+  box-shadow: 0 0 8px var(--accent-glow);
+  animation: scan-pulse 0.6s ease-in-out infinite;
+}
+
+/* ── Status notification banners ─────────────────────────────────────────── */
+.status-notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.status-notification--error {
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  color: var(--red);
+}
+.status-notification-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.status-notification strong {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.status-notification p {
+  margin: 0;
+  opacity: 0.85;
+}
+.status-notification-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-top: 4px !important;
+  opacity: 0.7 !important;
+}
+/* ── Low confidence warning ──────────────────────────────────────────────── */
+.status-notification--warning {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid #fbbf24;
+  color: #fbbf24;
+}
+.conf-warning {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #fbbf24;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ── Speak button ────────────────────────────────────────────────────────── */
+.btn-action--speak {
+  border-color: var(--accent-dim);
+  color: var(--accent-text);
+}
+.btn-action--speak:hover:not(:disabled) {
+  border-color: var(--accent) !important;
+  color: var(--accent-text) !important;
+  background: var(--accent-glow) !important;
+}
+.btn-action--speaking {
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+  animation: scan-pulse 0.8s ease-in-out infinite;
+}
+
+/* ── Font size slider in settings ────────────────────────────────────────── */
+.setting-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.setting-slider {
+  width: 140px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.setting-slider-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent-text);
+  min-width: 44px;
+}
+.setting-preview {
+  display: block;
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  margin-top: 6px;
+  line-height: 1;
+  transition: font-size 0.1s;
+}
+
+/* ── Admin chart ─────────────────────────────────────────────────────────── */
+.dash-chart-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-top: 20px;
+}
+.dash-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 160px;
+  padding-top: 8px;
+}
+.dash-chart-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+.dash-chart-bar-track {
+  width: 100%;
+  background: var(--bg-raised);
+  border-radius: var(--radius-sm);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  min-height: 120px;
+}
+.dash-chart-bar-fill {
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+  transition: height 0.4s ease;
+  min-height: 4px;
+}
+.dash-chart-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-text);
+}
+.dash-chart-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+/* ── Confidence color variants ───────────────────────────────────────────── */
+.conf-fill--high {
+  background: var(--green);
+}
+.conf-fill--mid {
+  background: var(--amber, #fbbf24);
+}
+.conf-fill--low {
+  background: var(--red);
+}
+.conf-label--warn {
+  color: var(--red);
+  font-weight: 700;
+}
+.conf-warning-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* ── Low confidence notification ─────────────────────────────────────────── */
+.status-notification--warn {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid #fbbf24;
+  color: #fbbf24;
+}
+
+/* ── TTS buttons ─────────────────────────────────────────────────────────── */
+.btn-action--tts:hover:not(:disabled) {
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+  background: rgba(52, 211, 153, 0.1) !important;
+}
+.btn-tts-small {
+  background: none;
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 2px 7px;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+  flex-shrink: 0;
+}
+.btn-tts-small:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* Recent actions row */
+.recent-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Font preview ────────────────────────────────────────────────────────── */
+.font-preview {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-text);
+  letter-spacing: 0.1em;
+  background: var(--bg-base);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  transition: font-size 0.2s ease;
+}
+
+/* ── Admin chart ─────────────────────────────────────────────────────────── */
+.dash-chart-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-top: 20px;
+}
+.dash-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 200px;
+  padding-top: 24px;
+}
+.dash-bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+.dash-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 160px;
+  gap: 4px;
+}
+.dash-bar {
+  width: 100%;
+  min-height: 4px;
+  border-radius: 3px 3px 0 0;
+  transition: height 0.4s ease;
+}
+.dash-bar-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.dash-bar-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-text);
+}
+/* ── Sentence row right section ──────────────────────────────────────────── */
+.sentence-row-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ── Admin table alignment fix ───────────────────────────────────────────── */
+.history-table {
+  table-layout: auto;
+  width: 100%;
+}
+.history-table th:nth-child(1),
+.history-table td:nth-child(1) {
+  width: 60px;
+  white-space: nowrap;
+}
+.history-table th:nth-child(2),
+.history-table td:nth-child(2) {
+  width: 80px;
+}
+.history-table th:nth-child(3),
+.history-table td:nth-child(3) {
+  width: 220px;
+}
+.history-table th:nth-child(4),
+.history-table td:nth-child(4) {
+  width: 130px;
+  white-space: nowrap;
+}
+.history-table th:nth-child(5),
+.history-table td:nth-child(5) {
+  width: 200px;
+  white-space: nowrap;
+}
+
+.td-conf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.mini-bar-track {
+  flex-shrink: 0;
+}
+/* ── Letter card low-confidence state — no border change to avoid jitter ── */
+.letter-card--warn {
+  border-color: var(--border-dim);
+}
+.letter-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+.letter-card-header .card-eyebrow {
+  margin-bottom: 12px;
+}
+.conf-warn-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  border-radius: 100px;
+  padding: 2px 10px;
+  margin-bottom: 12px;
+}
+/* ── Settings section titles ─────────────────────────────────────────────── */
+.settings-section-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  padding-left: 2px;
+}
+
+/* ── Font preview refinement ─────────────────────────────────────────────── */
+.font-preview {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-text);
+  letter-spacing: 0.1em;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  transition: font-size 0.2s ease;
+  white-space: nowrap;
+}
+
+/* ── Dictionary card image size increase ─────────────────────────────────── */
+.dict-card-img-wrap {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 12px;
+}
+
+/* ── Dashboard chart height increase ─────────────────────────────────────── */
+.dash-chart {
+  height: 260px;
+  padding-top: 32px;
+}
+.dash-bar-wrap {
+  height: 200px;
+}
+
+/* ── Recognizer page — full width layout ─────────────────────────────────── */
+.recognizer-page {
+  padding-top: 20px;
+  max-width: 100%;
+}
+.recognizer-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+  align-items: start;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.cam-frame {
+  aspect-ratio: 16 / 10;
+}
+
+/* ── Remove redundant history description box on clean pages ─────────────── */
+.history-desc {
+  display: none;
+}
+/* ── Letter card fixed height — prevents jitter when content changes ─────── */
+.letter-card {
+  min-height: 220px;
+}
+.letter-card-header {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+.letter-card-header .card-eyebrow {
+  margin-bottom: 0;
+}
+.letter-display {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent-text);
+  text-shadow: 0 0 40px var(--accent-glow);
+  margin: 8px 0;
+}
+.conf-warning-text {
+  min-height: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 6px;
+  text-align: center;
+}
+/* ── Letter card — always reserve space for warning elements ─────────────── */
+.conf-warn-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 100px;
+  padding: 2px 10px;
+  white-space: nowrap;
+  /* Always visible in DOM but transparent when not warning */
+  opacity: 0;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  transition: opacity 0.2s ease;
+}
+.conf-warn-badge--visible {
+  opacity: 1;
+}
+.conf-warning-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-top: 6px;
+  text-align: center;
+  height: 20px;
+  /* Always in DOM, transparent when not warning */
+  opacity: 0;
+  color: var(--red);
+  transition: opacity 0.2s ease;
+}
+.conf-warning-text--visible {
+  opacity: 1;
+}

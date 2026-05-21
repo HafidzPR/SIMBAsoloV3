@@ -26,3 +26,17 @@ export interface SettingItem {
   value: string;
   label: string;
 }
+
+export interface AdminInfo {
+  id: number;
+  username: string;
+  email: string;
+}
+
+export interface AdminStats {
+  total_predictions: number;
+  total_sessions: number;
+  avg_confidence: number;
+  top_letter: string;
+  total_sentences: number;
+}

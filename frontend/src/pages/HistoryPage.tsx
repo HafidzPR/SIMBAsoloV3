@@ -16,6 +16,15 @@ interface SavedSentence {
 
 type Tab = "sentences" | "letters";
 
+function speak(text: string) {
+  if (!text.trim()) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = "id-ID";
+  utt.rate = 0.9;
+  window.speechSynthesis.speak(utt);
+}
+
 export function HistoryPage() {
   const [tab, setTab] = useState<Tab>("sentences");
   const [sentences, setSentences] = useState<SavedSentence[]>([]);
@@ -62,7 +71,6 @@ export function HistoryPage() {
     }
   };
 
-  // Group letters by session
   const bySession = letters.reduce<Record<string, HistoryItem[]>>(
     (acc, item) => {
       (acc[item.session_id] ??= []).push(item);
@@ -87,7 +95,6 @@ export function HistoryPage() {
 
   return (
     <div className="page history-page">
-      {/* ── Header ──────────────────────────────────────────────────── */}
       <div className="history-header">
         <div>
           <h1 className="page-title">History</h1>
@@ -107,7 +114,6 @@ export function HistoryPage() {
         </div>
       </div>
 
-      {/* ── Description ─────────────────────────────────────────────── */}
       <div className="history-desc">
         <div className="history-desc-item">
           <span
@@ -134,7 +140,6 @@ export function HistoryPage() {
 
       {error && <p className="error-banner">{error}</p>}
 
-      {/* ── Search ──────────────────────────────────────────────────── */}
       <div className="history-search">
         <input
           className="history-search-input"
@@ -152,7 +157,6 @@ export function HistoryPage() {
         )}
       </div>
 
-      {/* ── Tabs ────────────────────────────────────────────────────── */}
       <div className="history-tabs">
         <button
           className={`history-tab${tab === "sentences" ? " history-tab--active" : ""}`}
@@ -172,13 +176,13 @@ export function HistoryPage() {
 
       {loading ? (
         <div className="loading-state">Loading...</div>
-      ) : /* ── SENTENCES TAB ─────────────────────────────────────────── */
-      tab === "sentences" ? (
+      ) : tab === "sentences" ? (
+        /* ── SENTENCES TAB ───────────────────────────────────────────── */
         <div>
           <div className="history-tab-header">
             <p className="history-tab-desc">
-              These are sentences you intentionally saved. Each row shows the
-              full text, when it was saved, and which session it came from.
+              These are sentences you intentionally saved. Click ▶ to hear them
+              read aloud.
             </p>
             <button
               className="btn-danger"
@@ -210,8 +214,17 @@ export function HistoryPage() {
                       Session {s.session_id.slice(-5)}
                     </span>
                   </div>
-                  <div className="sentence-row-time">
-                    {new Date(s.timestamp).toLocaleString()}
+                  <div className="sentence-row-right">
+                    <div className="sentence-row-time">
+                      {new Date(s.timestamp).toLocaleString()}
+                    </div>
+                    <button
+                      className="btn-tts-small"
+                      onClick={() => speak(s.text)}
+                      title="Read aloud"
+                    >
+                      ▶
+                    </button>
                   </div>
                 </div>
               ))}
@@ -219,13 +232,12 @@ export function HistoryPage() {
           )}
         </div>
       ) : (
-        /* ── LETTERS TAB ───────────────────────────────────────────── */
+        /* ── LETTERS TAB ─────────────────────────────────────────────── */
         <div>
           <div className="history-tab-header">
             <p className="history-tab-desc">
               Every letter the ML model detected above the confidence threshold,
-              grouped by session. A session is one continuous camera session on
-              the Recognizer page.
+              grouped by session.
             </p>
             <button
               className="btn-danger"
@@ -262,6 +274,13 @@ export function HistoryPage() {
                         </span>
                       </div>
                       <div className="session-header-right">
+                        <button
+                          className="btn-tts-small"
+                          onClick={() => speak(word)}
+                          title="Read aloud"
+                        >
+                          ▶
+                        </button>
                         <span className="session-avgconf">avg {avgConf}%</span>
                         <span className="session-meta">
                           {earliest ? new Date(earliest).toLocaleString() : ""}

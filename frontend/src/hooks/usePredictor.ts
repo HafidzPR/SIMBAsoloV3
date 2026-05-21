@@ -2,6 +2,15 @@ import { useRef, useState, useCallback } from "react";
 import { postPredict } from "../api/client";
 import type { PredictResponse } from "../types";
 
+export type PredictionStatus =
+  | "idle"
+  | "capturing"
+  | "analyzing"
+  | "translating"
+  | "done"
+  | "no_hand"
+  | "error";
+
 export interface PredictorOptions {
   captureFrame: () => string | null;
   sessionId: string;
@@ -18,7 +27,7 @@ export function usePredictor({
   onConfirmed,
 }: PredictorOptions) {
   const [result, setResult] = useState<PredictResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<PredictionStatus>("idle");
   const [apiError, setApiError] = useState<string | null>(null);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -28,6 +37,8 @@ export function usePredictor({
 
   const startPolling = useCallback(() => {
     if (intervalRef.current) return;
+    setStatus("capturing");
+
     intervalRef.current = setInterval(async () => {
       const now = Date.now();
       if (now - lastCallRef.current < pollMs) return;
@@ -36,14 +47,28 @@ export function usePredictor({
       const frame = captureFrame();
       if (!frame) return;
 
-      setLoading(true);
+      // Step 1 — capturing frame
+      setStatus("analyzing");
       setApiError(null);
+
       try {
+        // Step 2 — sent to ML, now analyzing landmarks
         const data = await postPredict(frame, sessionId);
+
+        if (!data.hand_detected) {
+          setStatus("no_hand");
+          setResult(data);
+          candidateRef.current = "";
+          streakRef.current = 0;
+          return;
+        }
+
+        // Step 3 — hand found, translating to letter
+        setStatus("translating");
         setResult(data);
 
-        const { letter, hand_detected } = data;
-        if (hand_detected && letter) {
+        const { letter } = data;
+        if (letter) {
           if (letter === candidateRef.current) {
             streakRef.current += 1;
           } else {
@@ -54,14 +79,15 @@ export function usePredictor({
             onConfirmed?.(letter);
             streakRef.current = 0;
           }
-        } else {
-          candidateRef.current = "";
-          streakRef.current = 0;
         }
+
+        // Step 4 — translation complete
+        setStatus("done");
       } catch (e: any) {
-        setApiError(e.message ?? "Prediction error");
-      } finally {
-        setLoading(false);
+        setApiError(e.message ?? "Connection error");
+        setStatus("error");
+        candidateRef.current = "";
+        streakRef.current = 0;
       }
     }, pollMs);
   }, [captureFrame, sessionId, pollMs, confirmFrames, onConfirmed]);
@@ -75,7 +101,8 @@ export function usePredictor({
     streakRef.current = 0;
     setResult(null);
     setApiError(null);
+    setStatus("idle");
   }, []);
 
-  return { result, loading, apiError, startPolling, stopPolling };
+  return { result, status, apiError, startPolling, stopPolling };
 }
