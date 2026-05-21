@@ -1,4 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Camera,
+  CameraOff,
+  Mic,
+  Trash2,
+  Space,
+  X,
+  Play,
+  BookmarkPlus,
+  ChevronRight,
+  SkipForward,
+  Download,
+  RotateCcw,
+  AlertTriangle,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
 import { useWebcam } from "../hooks/useWebcam";
 import { usePredictor } from "../hooks/usePredictor";
 import { LandmarkOverlay } from "../components/LandmarkOverlay";
@@ -51,7 +68,6 @@ interface TestResult {
   confidence: number;
   skipped: boolean;
 }
-
 interface SessionStats {
   duration: number;
   letterCount: number;
@@ -59,7 +75,6 @@ interface SessionStats {
   topLetter: string;
   word: string;
 }
-
 type PageMode = "recognizer" | "test";
 type TestState = "idle" | "running" | "finished";
 
@@ -76,15 +91,12 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
   const { videoRef, canvasRef, active, error, start, stop, captureFrame } =
     useWebcam();
 
-  // ── Shared state ──────────────────────────────────────────────────────────
   const [mode, setMode] = useState<PageMode>("recognizer");
   const [vidSize, setVidSize] = useState({ w: 640, h: 480 });
   const [camError, setCamError] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<number>(() =>
     parseInt(localStorage.getItem("simba-font-size") || "28"),
   );
-
-  // ── Recognizer state ──────────────────────────────────────────────────────
   const [word, setWord] = useState("");
   const [showSummary, setShowSummary] = useState(false);
   const [sessionStats, setSessionStats] = useState<SessionStats | null>(null);
@@ -93,7 +105,6 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
     [],
   );
 
-  // ── Test state ────────────────────────────────────────────────────────────
   const [testState, setTestState] = useState<TestState>("idle");
   const [testIdx, setTestIdx] = useState(0);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
@@ -106,60 +117,25 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
   const testIdxRef = useRef(0);
   const testConfRef = useRef(0);
   const testStateRef = useRef<TestState>("idle");
-
-  const currentTarget = ALPHABET[testIdx] ?? "";
-
-  // ── Prediction callbacks via ref so usePredictor always calls current one ─
+  const testHoldRef = useRef(0);
+  const testLockRef = useRef(false);
   const modeRef = useRef<PageMode>("recognizer");
+
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
 
   const onConfirmedRef = useRef<(letter: string) => void>(() => {});
-
   const onConfirmedRecognizer = useCallback((letter: string) => {
     setWord((w) => w + letter);
   }, []);
+  const onConfirmedTest = useCallback((_letter: string) => {}, []);
 
-  const onConfirmedTest = useCallback((letter: string) => {
-    if (testStateRef.current !== "running") return;
-    setTestDetected(letter);
-    setConfirmState("confirmed");
-    if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
-    confirmTimerRef.current = setTimeout(() => {
-      const idx = testIdxRef.current;
-      const conf = testConfRef.current;
-      const target = ALPHABET[idx];
-      const newResult: TestResult = {
-        target,
-        detected: letter,
-        correct: letter === target,
-        confidence: conf,
-        skipped: false,
-      };
-      const nextIdx = idx + 1;
-      if (nextIdx >= ALPHABET.length) {
-        testStateRef.current = "finished";
-        setTestState("finished");
-        setTestResults((prev) => [...prev, newResult]);
-        stopPolling();
-      } else {
-        testIdxRef.current = nextIdx;
-        setTestIdx(nextIdx);
-        setTestResults((prev) => [...prev, newResult]);
-        setConfirmState("waiting");
-        setTestDetected("");
-      }
-    }, 1200);
-  }, []);
-
-  // Keep ref pointing to correct callback based on current mode
   useEffect(() => {
     onConfirmedRef.current =
       modeRef.current === "test" ? onConfirmedTest : onConfirmedRecognizer;
   }, [mode, onConfirmedTest, onConfirmedRecognizer]);
 
-  // Stable wrapper that always delegates to current ref
   const onConfirmed = useCallback((letter: string) => {
     onConfirmedRef.current(letter);
   }, []);
@@ -168,36 +144,25 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
     captureFrame,
     sessionId,
     pollMs: 200,
-    confirmFrames: mode === "test" ? 1 : 4,
+    confirmFrames: 4,
     onConfirmed,
   });
 
-  // Track confidence for test + handle test auto-advance directly
-  const testHoldRef = useRef(0); // consecutive frames holding same letter
-  const testLockRef = useRef(false); // prevent double-firing while timer runs
-
   useEffect(() => {
     if (!result?.hand_detected) return;
-
     const letter = result.letter ?? "";
     const conf = result.confidence ?? 0;
     testConfRef.current = conf;
-
     if (modeRef.current !== "test" || testStateRef.current !== "running") {
       setTestDetected(letter);
       setTestConf(conf);
       return;
     }
-
-    // In test mode — show detected letter live
     setTestDetected(letter);
     setTestConf(conf);
-
     const target = ALPHABET[testIdxRef.current];
-
     if (letter === target && !testLockRef.current) {
       testHoldRef.current += 1;
-      // Require 5 consecutive frames holding the correct letter (~1 second at 200ms)
       if (testHoldRef.current >= 5) {
         testLockRef.current = true;
         testHoldRef.current = 0;
@@ -229,43 +194,39 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
         }, 800);
       }
     } else if (letter !== target) {
-      // Wrong letter — reset hold counter
       testHoldRef.current = 0;
     }
   }, [result]);
 
-  // Track letters for session summary
   useEffect(() => {
     if (
       result?.hand_detected &&
       result.letter &&
       active &&
       mode === "recognizer"
-    ) {
+    )
       sessionLettersRef.current.push({
         letter: result.letter,
         confidence: result.confidence,
       });
-    }
   }, [result, active, mode]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const handler = () =>
+    const h = () =>
       setVidSize({ w: v.videoWidth || 640, h: v.videoHeight || 480 });
-    v.addEventListener("loadedmetadata", handler);
-    return () => v.removeEventListener("loadedmetadata", handler);
+    v.addEventListener("loadedmetadata", h);
+    return () => v.removeEventListener("loadedmetadata", h);
   }, [videoRef]);
 
   useEffect(() => {
-    const handler = () =>
+    const h = () =>
       setFontSize(parseInt(localStorage.getItem("simba-font-size") || "28"));
-    window.addEventListener("simba-font-size-changed", handler);
-    return () => window.removeEventListener("simba-font-size-changed", handler);
+    window.addEventListener("simba-font-size-changed", h);
+    return () => window.removeEventListener("simba-font-size-changed", h);
   }, []);
 
-  // ── Camera toggle ─────────────────────────────────────────────────────────
   const handleToggle = async () => {
     setCamError(null);
     if (active) {
@@ -335,7 +296,6 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
     }
   };
 
-  // ── Mode switch — stop camera first ──────────────────────────────────────
   const handleModeSwitch = (newMode: PageMode) => {
     if (active) {
       stopPolling();
@@ -355,7 +315,6 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
     setTestDetected("");
   };
 
-  // ── Test controls ─────────────────────────────────────────────────────────
   const handleSkip = () => {
     if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
     testHoldRef.current = 0;
@@ -399,7 +358,6 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
     }
   };
 
-  // ── Recognizer controls ───────────────────────────────────────────────────
   const addSpace = () => setWord((w) => w + " ");
   const deleteLetter = () => setWord((w) => w.slice(0, -1));
   const clearWord = () => setWord("");
@@ -410,7 +368,6 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
   };
   const speakWord = () => speak(word);
 
-  // ── Display values ────────────────────────────────────────────────────────
   const liveLetter = result?.letter ?? "";
   const liveConf = Math.round((result?.confidence ?? 0) * 100);
   const handDetected = result?.hand_detected ?? false;
@@ -437,10 +394,6 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
           ? "cam-scanning cam-scanning--done"
           : "cam-scanning";
 
-  const dotClass = active ? "status-dot status-dot--on" : "status-dot";
-  const dotLabel = active ? t("rec.cameraActive") : t("rec.cameraOff");
-
-  // ── Test stats ────────────────────────────────────────────────────────────
   const correct = testResults.filter((r) => r.correct).length;
   const incorrect = testResults.filter((r) => !r.correct && !r.skipped).length;
   const skipped = testResults.filter((r) => r.skipped).length;
@@ -456,32 +409,37 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
             100,
         )
       : 0;
+  const currentTarget = ALPHABET[testIdx] ?? "";
 
   return (
-    <div className="page recognizer-page">
-      {/* ── Mode Toggle ──────────────────────────────────────────────── */}
-      <div className="mode-toggle-bar">
+    <div className="rec-page">
+      {/* Mode Toggle */}
+      <div className="rec-mode-bar">
         <button
-          className={`mode-btn${mode === "recognizer" ? " mode-btn--active" : ""}`}
+          className={`rec-mode-btn${mode === "recognizer" ? " rec-mode-btn--on" : ""}`}
           onClick={() => handleModeSwitch("recognizer")}
         >
+          <Camera size={14} />
           {t("nav.recognizer")}
         </button>
         <button
-          className={`mode-btn${mode === "test" ? " mode-btn--active" : ""}`}
+          className={`rec-mode-btn${mode === "test" ? " rec-mode-btn--on" : ""}`}
           onClick={() => handleModeSwitch("test")}
         >
+          <ChevronRight size={14} />
           {t("nav.test")}
         </button>
       </div>
 
-      <div className="recognizer-grid">
-        {/* ── LEFT: Camera (shared between modes) ──────────────────── */}
-        <div className="cam-col">
-          <div className="cam-frame">
+      <div className="rec-grid">
+        {/* ══ LEFT: Camera ═══════════════════════════════════════════ */}
+        <div className="rec-cam-col">
+          <div
+            className={`rec-cam-frame${active ? " rec-cam-frame--active" : ""}`}
+          >
             <video
               ref={videoRef}
-              className={`cam-video${active ? " cam-video--active" : ""}`}
+              className={`rec-cam-video${active ? " rec-cam-video--on" : ""}`}
               muted
               playsInline
               autoPlay
@@ -490,7 +448,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
             <canvas ref={canvasRef} style={{ display: "none" }} />
             <canvas
               ref={overlayRef}
-              className="cam-overlay-canvas"
+              className="rec-cam-canvas"
               width={vidSize.w}
               height={vidSize.h}
             />
@@ -500,107 +458,101 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
               width={vidSize.w}
               height={vidSize.h}
             />
+
             {!active && (
-              <div className="cam-idle">
-                <div className="cam-idle-icon">◉</div>
-                <p>{t("rec.cameraInactive")}</p>
+              <div className="rec-cam-idle">
+                <div className="rec-cam-idle-icon">
+                  <Camera size={52} strokeWidth={1} />
+                </div>
+                <p className="rec-cam-idle-text">{t("rec.cameraInactive")}</p>
+                <p className="rec-cam-idle-hint">{t("rec.startCamera")}</p>
               </div>
             )}
+
             {active && !handDetected && status !== "error" && (
-              <div className="cam-hint">{t("rec.showHand")}</div>
+              <div className="rec-cam-hint">{t("rec.showHand")}</div>
             )}
             {active && scanText && <div className={scanClass}>{scanText}</div>}
+
+            {active && (
+              <div className="rec-cam-live-badge">
+                <span className="rec-live-dot" />
+                LIVE
+              </div>
+            )}
           </div>
 
+          {/* Error banners */}
           {(camError || error) && (
-            <div className="status-notification status-notification--error">
-              <span className="status-notification-icon">⚠</span>
-              <div>
-                <strong>{t("err.cameraError")}</strong>
-                <p>{camError ?? error}</p>
-              </div>
+            <div className="rec-error-bar">
+              <AlertTriangle size={14} />
+              <span>{camError ?? error}</span>
             </div>
           )}
           {apiError && (
-            <div className="status-notification status-notification--error">
-              <span className="status-notification-icon">⚠</span>
-              <div>
-                <strong>{t("err.connectionError")}</strong>
-                <p>{apiError}</p>
-                <p className="status-notification-hint">{t("err.mlHint")}</p>
-              </div>
+            <div className="rec-error-bar">
+              <WifiOff size={14} />
+              <span>
+                {t("err.connectionError")} — {t("err.mlHint")}
+              </span>
             </div>
           )}
 
+          {/* Camera button — full width matching camera frame */}
           <button
-            className={`btn-cam${active ? " btn-cam--stop" : " btn-cam--start"}`}
+            className={`rec-cam-btn${active ? " rec-cam-btn--stop" : " rec-cam-btn--start"}`}
             onClick={handleToggle}
             disabled={mode === "test" && testState === "finished"}
           >
-            {active ? t("rec.stopCamera") : t("rec.startCamera")}
+            {active ? (
+              <>
+                <CameraOff size={16} /> {t("rec.stopCamera")}
+              </>
+            ) : (
+              <>
+                <Camera size={16} /> {t("rec.startCamera")}
+              </>
+            )}
           </button>
-
-          <div className="status-bar">
-            <span className={dotClass} />
-            <span className="status-label">{dotLabel}</span>
-          </div>
-
-          {/* Recent sentences — recognizer mode only */}
-          {mode === "recognizer" && recentSentences.length > 0 && (
-            <div className="recent-card">
-              <span className="card-eyebrow">{t("rec.recentSentences")}</span>
-              <ul className="recent-list">
-                {recentSentences.map((s) => (
-                  <li key={s.id} className="recent-item">
-                    <span className="recent-text">{s.text}</span>
-                    <div className="recent-actions">
-                      <span className="recent-time">{s.time}</span>
-                      <button
-                        className="btn-tts-small"
-                        onClick={() => speak(s.text)}
-                      >
-                        ▶
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          {active && (
+            <div className="rec-status-bar">
+              <span className="rec-status-dot rec-status-dot--on" />
+              <span className="rec-status-label">{t("rec.cameraActive")}</span>
             </div>
           )}
 
-          {/* Test progress — test mode only */}
+          {/* Test progress */}
           {mode === "test" && testState === "running" && (
-            <div className="test-progress">
-              <div className="test-progress-header">
-                <span className="card-eyebrow">{t("test.progress")}</span>
-                <span className="test-progress-count">
+            <div className="rec-test-progress">
+              <div className="rec-test-progress-header">
+                <span className="rec-eyebrow">{t("test.progress")}</span>
+                <span className="rec-test-count">
                   {testResults.length} / {ALPHABET.length}
                 </span>
               </div>
-              <div className="test-progress-track">
+              <div className="rec-test-track">
                 <div
-                  className="test-progress-fill"
+                  className="rec-test-fill"
                   style={{
                     width: `${(testResults.length / ALPHABET.length) * 100}%`,
                   }}
                 />
               </div>
-              <div className="test-progress-chips">
+              <div className="rec-test-chips">
                 {ALPHABET.map((l, i) => {
                   const res = testResults.find((r) => r.target === l);
-                  const isCurrent = i === testIdx;
                   return (
                     <span
                       key={l}
-                      className={`test-chip${
-                        isCurrent
-                          ? " test-chip--current"
+                      className={`rec-test-chip${
+                        i === testIdx
+                          ? " rec-test-chip--cur"
                           : res?.correct
-                            ? " test-chip--correct"
+                            ? " rec-test-chip--ok"
                             : res?.skipped
-                              ? " test-chip--skipped"
+                              ? " rec-test-chip--skip"
                               : res
-                                ? " test-chip--incorrect"
+                                ? " rec-test-chip--fail"
                                 : ""
                       }`}
                     >
@@ -611,132 +563,175 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
               </div>
             </div>
           )}
+
+          {/* Recent sentences */}
+          {mode === "recognizer" && recentSentences.length > 0 && (
+            <div className="rec-recent">
+              <span className="rec-eyebrow">{t("rec.recentSentences")}</span>
+              <div className="rec-recent-list">
+                {recentSentences.map((s) => (
+                  <div key={s.id} className="rec-recent-item">
+                    <span className="rec-recent-text">{s.text}</span>
+                    <div className="rec-recent-meta">
+                      <span className="rec-recent-time">{s.time}</span>
+                      <button
+                        className="rec-icon-btn"
+                        onClick={() => speak(s.text)}
+                      >
+                        <Play size={10} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* ── RIGHT: Swaps based on mode ────────────────────────────── */}
-        <div className="right-col">
+        {/* ══ RIGHT: Output Panel ════════════════════════════════════ */}
+        <div className="rec-output-col">
           {/* ════ RECOGNIZER MODE ════ */}
           {mode === "recognizer" && (
             <>
-              <div className="letter-card">
-                <div className="letter-card-header">
-                  <span className="card-eyebrow">{t("rec.liveDetection")}</span>
+              {/* Detection panel — fixed height */}
+              <div className="rec-detect-panel">
+                <div className="rec-detect-header">
+                  <span className="rec-eyebrow">{t("rec.liveDetection")}</span>
                   <span
-                    className={`conf-warn-badge${showLowConf ? " conf-warn-badge--visible" : ""}`}
+                    className={`rec-warn-badge${showLowConf ? " rec-warn-badge--on" : ""}`}
                   >
-                    {t("rec.lowConfidence")} · {liveConf}%
+                    <AlertTriangle size={10} />
+                    {t("rec.lowConfidence")} {liveConf}%
                   </span>
                 </div>
-                <div className="letter-display">
-                  {handDetected && liveLetter ? liveLetter : "-"}
+                <div className="rec-letter-display">
+                  <span
+                    className={`rec-letter${handDetected && liveLetter ? " rec-letter--on" : ""}`}
+                  >
+                    {handDetected && liveLetter ? liveLetter : "—"}
+                  </span>
                 </div>
-                <div className="conf-row">
-                  <div className="conf-track">
+                <div className="rec-conf-row">
+                  <div className="rec-conf-track">
                     <div
-                      className={getConfClass(liveConf)}
+                      className={`rec-conf-fill ${getConfClass(liveConf)}`}
                       style={{ width: `${handDetected ? liveConf : 0}%` }}
                     />
                   </div>
                   <span
-                    className={`conf-label${showLowConf ? " conf-label--warn" : ""}`}
+                    className={`rec-conf-pct${showLowConf ? " rec-conf-pct--warn" : ""}`}
                   >
-                    {handDetected ? `${liveConf}%` : "-"}
+                    {handDetected ? `${liveConf}%` : "—"}
                   </span>
                 </div>
                 <p
-                  className={`conf-warning-text${showLowConf ? " conf-warning-text--visible" : ""}`}
+                  className={`rec-warn-text${showLowConf ? " rec-warn-text--on" : ""}`}
                 >
                   {t("rec.adjustHand")}
                 </p>
               </div>
 
-              <div className="top3-card">
-                <span className="card-eyebrow">{t("rec.topCandidates")}</span>
-                {handDetected && (result?.top3?.length ?? 0) > 0 ? (
-                  result!.top3.map((p) => (
-                    <div key={p.letter} className="top3-row">
-                      <span className="top3-letter">{p.letter}</span>
-                      <div className="top3-track">
-                        <div
-                          className="top3-fill"
-                          style={{
-                            width: `${Math.round(p.confidence * 100)}%`,
-                          }}
-                        />
+              {/* Top3 + Alphabet row */}
+              <div className="rec-secondary-row">
+                <div className="rec-top3-panel">
+                  <span className="rec-eyebrow">{t("rec.topCandidates")}</span>
+                  <div className="rec-top3-list">
+                    {handDetected && (result?.top3?.length ?? 0) > 0 ? (
+                      result!.top3.map((p) => (
+                        <div key={p.letter} className="rec-top3-row">
+                          <span className="rec-top3-letter">{p.letter}</span>
+                          <div className="rec-top3-track">
+                            <div
+                              className="rec-top3-fill"
+                              style={{
+                                width: `${Math.round(p.confidence * 100)}%`,
+                              }}
+                            />
+                          </div>
+                          <span className="rec-top3-pct">
+                            {Math.round(p.confidence * 100)}%
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rec-top3-empty">
+                        {t("rec.waitingDetection")}
                       </div>
-                      <span className="top3-pct">
-                        {Math.round(p.confidence * 100)}%
+                    )}
+                  </div>
+                </div>
+                <div className="rec-alpha-panel">
+                  <span className="rec-eyebrow">A–Z</span>
+                  <div className="rec-alpha-grid">
+                    {ALPHABET.map((l) => (
+                      <span
+                        key={l}
+                        className={`rec-alpha-cell${l === liveLetter && handDetected ? " rec-alpha-cell--on" : ""}`}
+                      >
+                        {l}
                       </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="top3-empty">{t("rec.waitingDetection")}</div>
-                )}
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="alpha-grid">
-                {ALPHABET.map((l) => (
-                  <span
-                    key={l}
-                    className={`alpha-cell${l === liveLetter && handDetected ? " alpha-cell--lit" : ""}`}
+              {/* Word builder */}
+              <div className="rec-builder-panel">
+                <div className="rec-builder-header">
+                  <span className="rec-eyebrow">{t("rec.wordBuilder")}</span>
+                  <button
+                    className="rec-icon-btn rec-icon-btn--speak"
+                    onClick={speakWord}
+                    disabled={!word.trim()}
                   >
-                    {l}
-                  </span>
-                ))}
-              </div>
-
-              <div className="builder-card">
-                <span className="card-eyebrow">{t("rec.wordBuilder")}</span>
+                    <Mic size={12} />
+                    {t("rec.speak")}
+                  </button>
+                </div>
                 <div
-                  className="builder-display"
+                  className="rec-builder-output"
                   style={{ fontSize: `${fontSize}px` }}
                 >
                   {word ? (
                     <>
                       <span>{word}</span>
-                      <span className="cursor">|</span>
+                      <span className="rec-cursor">|</span>
                     </>
                   ) : (
-                    <span className="builder-placeholder">
+                    <span className="rec-builder-ph">
                       {t("rec.signToBegin")}
                     </span>
                   )}
                 </div>
-                <div className="builder-actions">
+                <div className="rec-builder-actions">
                   <button
-                    className="btn-action"
+                    className="rec-action-btn"
                     onClick={deleteLetter}
                     disabled={!word}
                   >
-                    {t("rec.delete")}
+                    <Trash2 size={13} /> {t("rec.delete")}
                   </button>
                   <button
-                    className="btn-action"
+                    className="rec-action-btn"
                     onClick={addSpace}
                     disabled={!word}
                   >
-                    {t("rec.space")}
+                    <Space size={13} /> {t("rec.space")}
                   </button>
                   <button
-                    className="btn-action btn-action--clear"
+                    className="rec-action-btn rec-action-btn--clear"
                     onClick={clearWord}
                     disabled={!word}
                   >
-                    {t("rec.clear")}
-                  </button>
-                  <button
-                    className="btn-action btn-action--tts"
-                    onClick={speakWord}
-                    disabled={!word.trim()}
-                  >
-                    {t("rec.speak")}
+                    <X size={13} /> {t("rec.clear")}
                   </button>
                 </div>
                 <button
-                  className="btn-save-sentence"
+                  className="rec-save-btn"
                   onClick={saveSentence}
                   disabled={!word.trim()}
                 >
+                  <BookmarkPlus size={16} />
                   {t("rec.saveSentence")}
                 </button>
               </div>
@@ -745,149 +740,151 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
 
           {/* ════ TEST MODE — IDLE ════ */}
           {mode === "test" && testState === "idle" && (
-            <div className="test-idle-panel">
-              <div className="test-alphabet-preview">
+            <div className="rec-test-idle">
+              <div className="rec-test-info">
+                <p className="rec-eyebrow">{t("test.howItWorks")}</p>
+                <p className="rec-test-info-text">{t("test.howDesc")}</p>
+              </div>
+              <div className="rec-test-alpha-preview">
                 {ALPHABET.map((l) => (
-                  <span key={l} className="test-alpha-chip">
+                  <span key={l} className="rec-test-chip">
                     {l}
                   </span>
                 ))}
               </div>
-              <button className="test-start-btn" onClick={handleToggle}>
+              <button className="rec-test-start-btn" onClick={handleToggle}>
+                <Play size={16} />
                 {t("test.startTest")}
               </button>
             </div>
           )}
 
           {/* ════ TEST MODE — RUNNING ════ */}
-          {/* ════ TEST MODE — RUNNING ════ */}
           {mode === "test" && testState === "running" && (
-            <div className="test-prompt-card">
-              <div className="test-how-box">
-                <p className="test-how-title">{t("test.howItWorks")}</p>
-                <p className="test-how-body">{t("test.howDesc")}</p>
+            <div className="rec-test-running">
+              <div className="rec-test-how-inline">
+                <p className="rec-eyebrow">{t("test.howItWorks")}</p>
+                <p className="rec-test-how-text">{t("test.howDesc")}</p>
               </div>
-              <span className="card-eyebrow">{t("test.signThis")}</span>
-              <div className="test-target-letter">{currentTarget}</div>
-              <div className="test-detected-row">
-                <span className="test-detected-label">
-                  {t("test.detected")}
-                </span>
-                <span
-                  className={`test-detected-letter${
-                    confirmState === "confirmed"
-                      ? testDetected === currentTarget
-                        ? " test-detected--correct"
-                        : " test-detected--incorrect"
-                      : ""
-                  }`}
-                >
-                  {testDetected || "—"}
-                </span>
-              </div>
-              {confirmState === "confirmed" ? (
-                <div
-                  className={`test-verdict${testDetected === currentTarget ? " test-verdict--correct" : " test-verdict--incorrect"}`}
-                >
-                  {testDetected === currentTarget
-                    ? t("test.correct")
-                    : t("test.incorrect")}
+              <div className="rec-test-prompt">
+                <span className="rec-eyebrow">{t("test.signThis")}</span>
+                <div className="rec-test-target">{currentTarget}</div>
+                <div className="rec-test-detected-row">
+                  <span className="rec-test-detected-label">
+                    {t("test.detected")}
+                  </span>
+                  <span
+                    className={`rec-test-detected${
+                      confirmState === "confirmed"
+                        ? testDetected === currentTarget
+                          ? " rec-test-detected--ok"
+                          : " rec-test-detected--fail"
+                        : ""
+                    }`}
+                  >
+                    {testDetected || "—"}
+                  </span>
                 </div>
-              ) : (
-                <p className="test-waiting">{t("test.waitingSign")}</p>
-              )}
-              <button
-                className="btn-secondary test-skip-btn"
-                onClick={handleSkip}
-              >
-                {t("test.skip")}
-              </button>
+                {confirmState === "confirmed" ? (
+                  <div
+                    className={`rec-test-verdict${testDetected === currentTarget ? " rec-test-verdict--ok" : " rec-test-verdict--fail"}`}
+                  >
+                    {testDetected === currentTarget
+                      ? t("test.correct")
+                      : t("test.incorrect")}
+                  </div>
+                ) : (
+                  <p className="rec-test-waiting">{t("test.waitingSign")}</p>
+                )}
+                <button
+                  className="rec-action-btn rec-test-skip"
+                  onClick={handleSkip}
+                >
+                  <SkipForward size={13} /> {t("test.skip")}
+                </button>
+              </div>
             </div>
           )}
 
           {/* ════ TEST MODE — FINISHED ════ */}
           {mode === "test" && testState === "finished" && (
-            <div className="test-finished-panel">
-              <div className="test-complete-badge">✓ {t("test.completed")}</div>
-
-              <div
-                className="test-results-grid"
-                style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
-              >
-                <div className="test-result-card test-result-card--accent">
-                  <span className="test-result-value">{accuracy}%</span>
-                  <span className="test-result-label">
+            <div className="rec-test-finished">
+              <div className="rec-test-done-badge">✓ {t("test.completed")}</div>
+              <div className="rec-test-results-grid">
+                <div className="rec-test-result-card rec-test-result-card--accent">
+                  <span className="rec-test-result-val">{accuracy}%</span>
+                  <span className="rec-test-result-label">
                     {t("test.accuracy")}
                   </span>
                 </div>
-                <div className="test-result-card">
-                  <span className="test-result-value test-result-value--green">
+                <div className="rec-test-result-card">
+                  <span className="rec-test-result-val rec-test-result-val--green">
                     {correct}
                   </span>
-                  <span className="test-result-label">
+                  <span className="rec-test-result-label">
                     {t("test.correct_count")}
                   </span>
                 </div>
-                <div className="test-result-card">
-                  <span className="test-result-value test-result-value--red">
+                <div className="rec-test-result-card">
+                  <span className="rec-test-result-val rec-test-result-val--red">
                     {incorrect}
                   </span>
-                  <span className="test-result-label">
+                  <span className="rec-test-result-label">
                     {t("test.incorrect_count")}
                   </span>
                 </div>
-                <div className="test-result-card">
-                  <span className="test-result-value">{skipped}</span>
-                  <span className="test-result-label">{t("test.skipped")}</span>
+                <div className="rec-test-result-card">
+                  <span className="rec-test-result-val">{skipped}</span>
+                  <span className="rec-test-result-label">
+                    {t("test.skipped")}
+                  </span>
                 </div>
-                <div className="test-result-card">
-                  <span className="test-result-value">{avgTestConf}%</span>
-                  <span className="test-result-label">{t("test.avgConf")}</span>
+                <div className="rec-test-result-card">
+                  <span className="rec-test-result-val">{avgTestConf}%</span>
+                  <span className="rec-test-result-label">
+                    {t("test.avgConf")}
+                  </span>
                 </div>
               </div>
-
-              <div className="test-per-letter">
-                <p className="settings-info-title">{t("test.perLetter")}</p>
-                <div className="test-letter-grid">
+              <div className="rec-test-per-letter">
+                <p className="rec-eyebrow" style={{ marginBottom: 10 }}>
+                  {t("test.perLetter")}
+                </p>
+                <div className="rec-test-letter-grid">
                   {testResults.map((r) => (
                     <div
                       key={r.target}
-                      className={`test-letter-card${
+                      className={`rec-test-letter-card${
                         r.skipped
-                          ? " test-letter-card--skip"
+                          ? " rec-test-letter-card--skip"
                           : r.correct
-                            ? " test-letter-card--correct"
-                            : " test-letter-card--wrong"
+                            ? " rec-test-letter-card--ok"
+                            : " rec-test-letter-card--fail"
                       }`}
                     >
-                      <span className="test-letter-target">{r.target}</span>
+                      <span className="rec-test-letter-val">{r.target}</span>
                       {!r.skipped && (
-                        <span className="test-letter-detected">
+                        <span className="rec-test-letter-det">
                           → {r.detected || "?"}
                         </span>
                       )}
-                      {r.skipped ? (
-                        <span className="test-letter-status">—</span>
-                      ) : (
-                        <span className="test-letter-conf">
-                          {Math.round(r.confidence * 100)}%
-                        </span>
-                      )}
+                      <span className="rec-test-letter-conf">
+                        {r.skipped ? "—" : `${Math.round(r.confidence * 100)}%`}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
-
-              <div className="test-actions">
-                <button className="btn-secondary" onClick={handleRetakeTest}>
-                  {t("test.retake")}
+              <div className="rec-test-actions">
+                <button className="rec-action-btn" onClick={handleRetakeTest}>
+                  <RotateCcw size={13} /> {t("test.retake")}
                 </button>
                 <button
-                  className="btn-save-sentence"
+                  className="rec-save-btn"
                   style={{ flex: 1 }}
                   onClick={() => exportResultsCSV(testResults, lang)}
                 >
-                  {t("test.exportResults")}
+                  <Download size={16} /> {t("test.exportResults")}
                 </button>
               </div>
             </div>
@@ -895,7 +892,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
         </div>
       </div>
 
-      {/* ── Session Summary Modal ─────────────────────────────────── */}
+      {/* Session Summary Modal */}
       {showSummary && sessionStats && (
         <div className="sess-overlay" onClick={() => setShowSummary(false)}>
           <div className="sess-modal" onClick={(e) => e.stopPropagation()}>
@@ -905,7 +902,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
                 className="dict-modal-close"
                 onClick={() => setShowSummary(false)}
               >
-                ✕
+                <X size={16} />
               </button>
             </div>
             <div className="sess-stats">
@@ -946,7 +943,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
               </div>
             )}
             <button
-              className="btn-cam btn-cam--start"
+              className="rec-cam-btn rec-cam-btn--start"
               onClick={() => setShowSummary(false)}
             >
               {t("sess.close")}

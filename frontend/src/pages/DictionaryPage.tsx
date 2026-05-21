@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Search, X, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { useLang } from "../i18n/LanguageContext";
 
 interface SignEntry {
@@ -141,6 +142,36 @@ const SIGN_DATA: SignEntry[] = [
   },
 ].map((s) => ({ ...s, imagePath: `/sibi/${s.letter}.png` }));
 
+// Accent colors cycling through the alphabet cards
+const CARD_ACCENTS = [
+  "#0ea5e9",
+  "#6366f1",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#0ea5e9",
+  "#6366f1",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#0ea5e9",
+  "#6366f1",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#0ea5e9",
+  "#6366f1",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#0ea5e9",
+  "#6366f1",
+];
+
 export function DictionaryPage() {
   const { t, lang } = useLang();
   const [search, setSearch] = useState("");
@@ -172,61 +203,106 @@ export function DictionaryPage() {
   const modalSign = selected
     ? SIGN_DATA.find((s) => s.letter === selected)
     : null;
+  const modalAccent = selected
+    ? CARD_ACCENTS[SIGN_DATA.findIndex((s) => s.letter === selected)]
+    : "#0ea5e9";
 
   return (
-    <div className="page dictionary-page">
-      <div className="page-header">
+    <div className="page dict-page">
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <div className="dict-hero">
+        <div className="dict-hero-icon">
+          <BookOpen size={28} />
+        </div>
         <div>
           <h1 className="page-title">{t("dict.title")}</h1>
           <p className="page-subtitle">{t("dict.subtitle")}</p>
         </div>
+        <div className="dict-hero-badge">26</div>
       </div>
 
-      <div className="dict-desc">{t("dict.desc")}</div>
+      {/* ── Description ──────────────────────────────────────────────── */}
+      <p className="dict-intro">{t("dict.desc")}</p>
 
-      <div
-        className="history-search"
-        style={{ maxWidth: 400, marginBottom: 24 }}
-      >
+      {/* ── Search ───────────────────────────────────────────────────── */}
+      <div className="dict-search-wrap">
+        <Search size={15} className="dict-search-icon" />
         <input
-          className="history-search-input"
+          className="dict-search-input"
           placeholder={t("dict.search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         {search && (
-          <button
-            className="history-search-clear"
-            onClick={() => setSearch("")}
-          >
-            ✕
+          <button className="dict-search-clear" onClick={() => setSearch("")}>
+            <X size={13} />
           </button>
         )}
       </div>
 
-      <div className="dict-grid">
-        {filtered.map((sign) => (
-          <div
-            key={sign.letter}
-            className="dict-card"
-            onClick={() => setSelected(sign.letter)}
-          >
-            <div className="dict-card-img-wrap">
-              {imgError[sign.letter] ? (
-                <div className="dict-card-placeholder">{sign.letter}</div>
-              ) : (
-                <img
-                  src={sign.imagePath}
-                  alt={`SIBI ${sign.letter}`}
-                  className="dict-card-img"
-                  onError={() => handleImgError(sign.letter)}
-                />
-              )}
-            </div>
-            <div className="dict-card-letter">{sign.letter}</div>
-            <div className="dict-card-desc">{getDesc(sign)}</div>
+      {/* ── Stats row ────────────────────────────────────────────────── */}
+      {!search && (
+        <div className="dict-stats-row">
+          <div className="dict-stat">
+            <span className="dict-stat-num">26</span>
+            <span className="dict-stat-label">
+              {lang === "id" ? "Total Huruf" : "Total Letters"}
+            </span>
           </div>
-        ))}
+          <div className="dict-stat">
+            <span className="dict-stat-num">
+              {Object.keys(imgError).length === 0
+                ? "26"
+                : 26 - Object.keys(imgError).length}
+            </span>
+            <span className="dict-stat-label">
+              {lang === "id" ? "Gambar Tersedia" : "Images Available"}
+            </span>
+          </div>
+          <div className="dict-stat">
+            <span className="dict-stat-num">A–Z</span>
+            <span className="dict-stat-label">SIBI Alphabet</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Grid ─────────────────────────────────────────────────────── */}
+      <div className="dict-grid-new">
+        {filtered.map((sign, idx) => {
+          const accent =
+            CARD_ACCENTS[SIGN_DATA.findIndex((s) => s.letter === sign.letter)];
+          return (
+            <div
+              key={sign.letter}
+              className="dict-card-new"
+              style={{ "--card-accent": accent } as React.CSSProperties}
+              onClick={() => setSelected(sign.letter)}
+            >
+              {/* Accent top bar */}
+              <div className="dict-card-bar" />
+
+              {/* Letter badge */}
+              <div className="dict-card-badge">{sign.letter}</div>
+
+              {/* Image */}
+              <div className="dict-card-img-wrap-new">
+                {imgError[sign.letter] ? (
+                  <div className="dict-card-ph-new">{sign.letter}</div>
+                ) : (
+                  <img
+                    src={sign.imagePath}
+                    alt={`SIBI ${sign.letter}`}
+                    className="dict-card-img-new"
+                    onError={() => handleImgError(sign.letter)}
+                  />
+                )}
+              </div>
+
+              {/* Description */}
+              <p className="dict-card-desc-new">{getDesc(sign)}</p>
+            </div>
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (
@@ -237,6 +313,7 @@ export function DictionaryPage() {
         </div>
       )}
 
+      {/* ── How to add images ─────────────────────────────────────────── */}
       <div className="dict-instructions">
         <p className="settings-info-title">{t("dict.howToAdd")}</p>
         <ul className="settings-info-list">
@@ -246,49 +323,76 @@ export function DictionaryPage() {
         </ul>
       </div>
 
+      {/* ── Modal ────────────────────────────────────────────────────── */}
       {modalSign && (
         <div className="dict-modal-overlay" onClick={() => setSelected(null)}>
-          <div className="dict-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="dict-modal-header">
-              <span className="dict-modal-letter">{modalSign.letter}</span>
-              <button
-                className="dict-modal-close"
-                onClick={() => setSelected(null)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="dict-modal-img-wrap">
-              {imgError[modalSign.letter] ? (
-                <div className="dict-modal-placeholder">{modalSign.letter}</div>
-              ) : (
-                <img
-                  src={modalSign.imagePath}
-                  alt={`SIBI ${modalSign.letter}`}
-                  className="dict-modal-img"
-                  onError={() => handleImgError(modalSign.letter)}
-                />
-              )}
-            </div>
-            <p className="dict-modal-desc">{getDesc(modalSign)}</p>
-            <div className="dict-modal-nav">
-              <button
-                className="dict-modal-nav-btn"
-                onClick={goPrev}
-                disabled={currentIndex === 0}
-              >
-                ← {lang === "id" ? "Sebelumnya" : "Prev"}
-              </button>
-              <span className="dict-modal-nav-pos">
-                {currentIndex + 1} / {SIGN_DATA.length}
-              </span>
-              <button
-                className="dict-modal-nav-btn"
-                onClick={goNext}
-                disabled={currentIndex === SIGN_DATA.length - 1}
-              >
-                {lang === "id" ? "Berikutnya" : "Next"} →
-              </button>
+          <div
+            className="dict-modal-new"
+            style={{ "--modal-accent": modalAccent } as React.CSSProperties}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Accent strip */}
+            <div className="dict-modal-strip" />
+
+            <div className="dict-modal-inner">
+              {/* Header */}
+              <div className="dict-modal-header-new">
+                <div className="dict-modal-letter-badge">
+                  {modalSign.letter}
+                </div>
+                <div className="dict-modal-meta">
+                  <p className="dict-modal-title">Letter {modalSign.letter}</p>
+                  <p className="dict-modal-subtitle">SIBI Alphabet</p>
+                </div>
+                <button
+                  className="dict-modal-close"
+                  onClick={() => setSelected(null)}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Image */}
+              <div className="dict-modal-img-wrap-new">
+                {imgError[modalSign.letter] ? (
+                  <div className="dict-modal-ph-new">{modalSign.letter}</div>
+                ) : (
+                  <img
+                    src={modalSign.imagePath}
+                    alt={`SIBI ${modalSign.letter}`}
+                    className="dict-modal-img"
+                    onError={() => handleImgError(modalSign.letter)}
+                  />
+                )}
+              </div>
+
+              {/* Description */}
+              <div className="dict-modal-desc-box">
+                <p className="dict-modal-desc-text">{getDesc(modalSign)}</p>
+              </div>
+
+              {/* Navigation */}
+              <div className="dict-modal-nav-new">
+                <button
+                  className="dict-modal-nav-btn-new"
+                  onClick={goPrev}
+                  disabled={currentIndex === 0}
+                >
+                  <ChevronLeft size={16} />
+                  {lang === "id" ? "Sebelumnya" : "Prev"}
+                </button>
+                <span className="dict-modal-nav-pos">
+                  {currentIndex + 1} / {SIGN_DATA.length}
+                </span>
+                <button
+                  className="dict-modal-nav-btn-new"
+                  onClick={goNext}
+                  disabled={currentIndex === SIGN_DATA.length - 1}
+                >
+                  {lang === "id" ? "Berikutnya" : "Next"}
+                  <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
