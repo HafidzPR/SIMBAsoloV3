@@ -1,15 +1,10 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { adminLogout } from "../api/client";
-
-const links = [
-  { to: "/", label: "Recognizer" },
-  { to: "/history", label: "History" },
-  { to: "/dictionary", label: "Dictionary" },
-  { to: "/settings", label: "Settings" },
-];
+import { useLang } from "../i18n/LanguageContext";
 
 export function Navbar() {
   const navigate = useNavigate();
+  const { lang, setLang, t } = useLang();
   const adminInfo = localStorage.getItem("simba_admin_info");
   const isAdmin = !!adminInfo;
 
@@ -18,6 +13,13 @@ export function Navbar() {
     navigate("/");
     window.location.reload();
   };
+
+  const links = [
+    { to: "/", label: t("nav.recognizer") },
+    { to: "/history", label: t("nav.history") },
+    { to: "/dictionary", label: t("nav.dictionary") },
+    { to: "/settings", label: t("nav.settings") },
+  ];
 
   return (
     <nav className="navbar">
@@ -44,6 +46,24 @@ export function Navbar() {
       </div>
 
       <div className="navbar-right">
+        {/* Language toggle */}
+        <div className="lang-toggle">
+          <button
+            className={`lang-btn${lang === "en" ? " lang-btn--active" : ""}`}
+            onClick={() => setLang("en")}
+            title="English"
+          >
+            🇬🇧
+          </button>
+          <button
+            className={`lang-btn${lang === "id" ? " lang-btn--active" : ""}`}
+            onClick={() => setLang("id")}
+            title="Bahasa Indonesia"
+          >
+            🇮🇩
+          </button>
+        </div>
+
         {isAdmin ? (
           <>
             <NavLink
@@ -52,10 +72,10 @@ export function Navbar() {
                 `navbar-link${isActive ? " navbar-link--active" : ""}`
               }
             >
-              Dashboard
+              {t("nav.dashboard")}
             </NavLink>
             <button className="navbar-admin-badge" onClick={handleLogout}>
-              {JSON.parse(adminInfo!).username} · Logout
+              {JSON.parse(adminInfo!).username} · {t("nav.logout")}
             </button>
           </>
         ) : (
@@ -65,7 +85,7 @@ export function Navbar() {
               `navbar-link${isActive ? " navbar-link--active" : ""}`
             }
           >
-            Admin
+            {t("nav.admin")}
           </NavLink>
         )}
       </div>

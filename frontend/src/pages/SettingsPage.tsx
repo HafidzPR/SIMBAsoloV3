@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSettings, putSetting } from "../api/client";
+import { useLang } from "../i18n/LanguageContext";
 import type { SettingItem } from "../types";
 
 interface SettingsPageProps {
@@ -7,17 +8,10 @@ interface SettingsPageProps {
   setTheme: (theme: string) => void;
 }
 
-const FONT_SIZES = [
-  { label: "Small", value: 20 },
-  { label: "Medium", value: 28 },
-  { label: "Large", value: 36 },
-  { label: "X-Large", value: 48 },
-];
-
-// These keys are managed by custom UI controls above — hide from raw DB list
 const HIDDEN_KEYS = new Set(["display_font_size"]);
 
 export function SettingsPage({ theme, setTheme }: SettingsPageProps) {
+  const { t, lang, setLang } = useLang();
   const [settings, setSettings] = useState<SettingItem[]>([]);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<Record<string, boolean>>({});
@@ -27,6 +21,13 @@ export function SettingsPage({ theme, setTheme }: SettingsPageProps) {
   const [fontSize, setFontSizeState] = useState<number>(() =>
     parseInt(localStorage.getItem("simba-font-size") || "28"),
   );
+
+  const FONT_SIZES = [
+    { label: t("set.small"), value: 20 },
+    { label: t("set.medium"), value: 28 },
+    { label: t("set.large"), value: 36 },
+    { label: t("set.xlarge"), value: 48 },
+  ];
 
   useEffect(() => {
     getSettings()
@@ -73,57 +74,79 @@ export function SettingsPage({ theme, setTheme }: SettingsPageProps) {
     <div className="page settings-page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Settings</h1>
-          <p className="page-subtitle">
-            Configure system behaviour · changes take effect immediately
-          </p>
+          <h1 className="page-title">{t("set.title")}</h1>
+          <p className="page-subtitle">{t("set.subtitle")}</p>
         </div>
       </div>
 
       {error && <p className="error-banner">{error}</p>}
 
-      {/* ── Appearance ───────────────────────────────────────────────── */}
-      <p className="settings-section-title">APPEARANCE</p>
+      <p className="settings-section-title">{t("set.appearance")}</p>
       <div className="settings-list" style={{ marginBottom: 28 }}>
+        {/* Theme */}
         <div className="setting-row">
           <div className="setting-meta">
-            <span className="setting-key">interface_theme</span>
-            <span className="setting-label">
-              Color scheme applied across all pages. Saved in the browser.
-            </span>
+            <span className="setting-key">{t("set.themeKey")}</span>
+            <span className="setting-label">{t("set.themeLabel")}</span>
           </div>
           <div className="setting-control">
-            {(["dark", "light"] as const).map((t) => (
+            {(["dark", "light"] as const).map((thm) => (
               <button
-                key={t}
+                key={thm}
                 className="btn-secondary"
                 style={{
                   borderColor:
-                    theme === t ? "var(--accent)" : "var(--border-mid)",
+                    theme === thm ? "var(--accent)" : "var(--border-mid)",
                   background:
-                    theme === t ? "var(--accent-glow)" : "transparent",
+                    theme === thm ? "var(--accent-glow)" : "transparent",
                   color:
-                    theme === t
+                    theme === thm
                       ? "var(--accent-text)"
                       : "var(--text-secondary)",
-                  fontWeight: theme === t ? 700 : 400,
-                  minWidth: "100px",
+                  fontWeight: theme === thm ? 700 : 400,
+                  minWidth: 100,
                 }}
-                onClick={() => setTheme(t)}
+                onClick={() => setTheme(thm)}
               >
-                {t === "dark" ? "Dark Mode" : "Light Mode"}
+                {thm === "dark" ? t("set.darkMode") : t("set.lightMode")}
               </button>
             ))}
           </div>
         </div>
 
+        {/* Language */}
         <div className="setting-row">
           <div className="setting-meta">
-            <span className="setting-key">display_font_size</span>
-            <span className="setting-label">
-              Word Builder text size. Larger is easier to read across the
-              counter.
-            </span>
+            <span className="setting-key">{t("set.langKey")}</span>
+            <span className="setting-label">{t("set.langLabel")}</span>
+          </div>
+          <div className="setting-control">
+            {(["en", "id"] as const).map((l) => (
+              <button
+                key={l}
+                className="btn-secondary"
+                style={{
+                  borderColor:
+                    lang === l ? "var(--accent)" : "var(--border-mid)",
+                  background: lang === l ? "var(--accent-glow)" : "transparent",
+                  color:
+                    lang === l ? "var(--accent-text)" : "var(--text-secondary)",
+                  fontWeight: lang === l ? 700 : 400,
+                  minWidth: 100,
+                }}
+                onClick={() => setLang(l)}
+              >
+                {l === "en" ? "🇬🇧 English" : "🇮🇩 Indonesia"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Font size */}
+        <div className="setting-row">
+          <div className="setting-meta">
+            <span className="setting-key">{t("set.fontSizeKey")}</span>
+            <span className="setting-label">{t("set.fontSizeLabel")}</span>
           </div>
           <div className="setting-control" style={{ gap: 6 }}>
             {FONT_SIZES.map((f) => (
@@ -152,12 +175,11 @@ export function SettingsPage({ theme, setTheme }: SettingsPageProps) {
           </div>
         </div>
 
+        {/* Font preview */}
         <div className="setting-row">
           <div className="setting-meta">
-            <span className="setting-key">font_preview</span>
-            <span className="setting-label">
-              Live preview of how the Word Builder text will appear.
-            </span>
+            <span className="setting-key">{t("set.fontPreviewKey")}</span>
+            <span className="setting-label">{t("set.fontPreviewLabel")}</span>
           </div>
           <div className="font-preview" style={{ fontSize: `${fontSize}px` }}>
             SIMBAsoloV3
@@ -165,10 +187,9 @@ export function SettingsPage({ theme, setTheme }: SettingsPageProps) {
         </div>
       </div>
 
-      {/* ── ML / System Settings ──────────────────────────────────────── */}
-      <p className="settings-section-title">ML &amp; SYSTEM</p>
+      <p className="settings-section-title">{t("set.mlSystem")}</p>
       {loading ? (
-        <div className="loading-state">Loading settings...</div>
+        <div className="loading-state">{t("set.loading")}</div>
       ) : (
         <div className="settings-list">
           {visibleSettings.map((s) => (
@@ -189,7 +210,11 @@ export function SettingsPage({ theme, setTheme }: SettingsPageProps) {
                   onClick={() => handleSave(s.key)}
                   disabled={saving[s.key] || drafts[s.key] === s.value}
                 >
-                  {saving[s.key] ? "…" : saved[s.key] ? "✓ Saved" : "Save"}
+                  {saving[s.key]
+                    ? "…"
+                    : saved[s.key]
+                      ? t("set.saved")
+                      : t("set.save")}
                 </button>
               </div>
             </div>
@@ -198,28 +223,19 @@ export function SettingsPage({ theme, setTheme }: SettingsPageProps) {
       )}
 
       <div className="settings-info-box" style={{ marginTop: 28 }}>
-        <p className="settings-info-title">HOW SETTINGS WORK</p>
+        <p className="settings-info-title">{t("set.howItWorks")}</p>
         <ul className="settings-info-list">
           <li>
-            <strong>confidence_threshold</strong>
-            {" — predictions below this value are not saved to history"}
+            <strong>confidence_threshold</strong> — {t("set.confThreshDesc")}
           </li>
           <li>
-            <strong>confirm_frames</strong>
-            {
-              " — a letter must appear this many consecutive frames before being added"
-            }
+            <strong>confirm_frames</strong> — {t("set.confirmFramesDesc")}
           </li>
           <li>
-            <strong>poll_interval_ms</strong>
-            {
-              " — how often a frame is sent to the ML service; lower = faster but heavier on CPU"
-            }
+            <strong>poll_interval_ms</strong> — {t("set.pollDesc")}
           </li>
           <li>
-            <strong>model_version</strong>
-            {" — informational only; swap the actual file in "}
-            <code>ml-service/models/</code>
+            <strong>model_version</strong> — {t("set.modelDesc")}
           </li>
         </ul>
       </div>

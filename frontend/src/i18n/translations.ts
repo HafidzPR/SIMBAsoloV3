@@ -1,0 +1,319 @@
+export type Language = "en" | "id";
+
+export const translations = {
+  // ── Navbar ────────────────────────────────────────────────────────────────
+  "nav.recognizer": { en: "Recognizer", id: "Penerjemah" },
+  "nav.history": { en: "History", id: "Riwayat" },
+  "nav.dictionary": { en: "Dictionary", id: "Kamus" },
+  "nav.settings": { en: "Settings", id: "Pengaturan" },
+  "nav.dashboard": { en: "Dashboard", id: "Dasbor" },
+  "nav.admin": { en: "Admin", id: "Admin" },
+  "nav.logout": { en: "Logout", id: "Keluar" },
+
+  // ── Recognizer page ───────────────────────────────────────────────────────
+  "rec.liveDetection": { en: "LIVE DETECTION", id: "DETEKSI LANGSUNG" },
+  "rec.topCandidates": { en: "TOP CANDIDATES", id: "KANDIDAT TERATAS" },
+  "rec.wordBuilder": { en: "WORD BUILDER", id: "PEMBUAT KATA" },
+  "rec.recentSentences": { en: "RECENT SENTENCES", id: "KALIMAT TERBARU" },
+  "rec.startCamera": { en: "Start Camera", id: "Mulai Kamera" },
+  "rec.stopCamera": { en: "Stop Camera", id: "Hentikan Kamera" },
+  "rec.cameraActive": { en: "Camera active", id: "Kamera aktif" },
+  "rec.cameraOff": { en: "Camera off", id: "Kamera mati" },
+  "rec.cameraInactive": { en: "Camera inactive", id: "Kamera tidak aktif" },
+  "rec.showHand": { en: "Show your hand", id: "Tunjukkan tangan Anda" },
+  "rec.signToBegin": {
+    en: "Sign letters to begin...",
+    id: "Isyaratkan huruf untuk memulai...",
+  },
+  "rec.delete": { en: "⌫ Delete", id: "⌫ Hapus" },
+  "rec.space": { en: "␣ Space", id: "␣ Spasi" },
+  "rec.clear": { en: "✕ Clear", id: "✕ Bersihkan" },
+  "rec.speak": { en: "▶ Speak", id: "▶ Bicara" },
+  "rec.saveSentence": { en: "✓ Save Sentence", id: "✓ Simpan Kalimat" },
+  "rec.waitingDetection": {
+    en: "Waiting for detection...",
+    id: "Menunggu deteksi...",
+  },
+  "rec.lowConfidence": { en: "Low confidence", id: "Kepercayaan rendah" },
+  "rec.adjustHand": {
+    en: "Adjust hand position or lighting for better accuracy",
+    id: "Sesuaikan posisi tangan atau pencahayaan untuk akurasi lebih baik",
+  },
+  "rec.scanning": { en: "SCANNING", id: "MEMINDAI" },
+  "rec.analyzing": { en: "ANALYZING...", id: "MENGANALISIS..." },
+  "rec.translating": { en: "TRANSLATING...", id: "MENERJEMAHKAN..." },
+  "rec.done": { en: "DONE", id: "SELESAI" },
+
+  // ── Status messages ───────────────────────────────────────────────────────
+  "status.starting": { en: "Starting...", id: "Memulai..." },
+  "status.awaitingHand": { en: "Awaiting hand...", id: "Menunggu tangan..." },
+  "status.analyzing": { en: "Analyzing...", id: "Menganalisis..." },
+  "status.translating": { en: "Translating...", id: "Menerjemahkan..." },
+  "status.handDetected": { en: "Hand detected", id: "Tangan terdeteksi" },
+  "status.noHand": { en: "No hand in frame", id: "Tidak ada tangan" },
+  "status.connError": { en: "Connection error", id: "Kesalahan koneksi" },
+
+  // ── Error notifications ───────────────────────────────────────────────────
+  "err.cameraError": { en: "Camera Error", id: "Kesalahan Kamera" },
+  "err.cameraDenied": {
+    en: "Camera access denied. Please allow camera permissions.",
+    id: "Akses kamera ditolak. Mohon izinkan akses kamera.",
+  },
+  "err.connectionError": { en: "Connection Error", id: "Kesalahan Koneksi" },
+  "err.mlHint": {
+    en: "Check that the ML service is running on port 8001.",
+    id: "Pastikan layanan ML berjalan di port 8001.",
+  },
+
+  // ── History page ──────────────────────────────────────────────────────────
+  "hist.title": { en: "History", id: "Riwayat" },
+  "hist.subtitle": {
+    en: "{s} saved sentences · {l} letter predictions",
+    id: "{s} kalimat tersimpan · {l} prediksi huruf",
+  },
+  "hist.refresh": { en: "↻ Refresh", id: "↻ Segarkan" },
+  "hist.filter": { en: "Filter...", id: "Filter..." },
+  "hist.savedSentences": { en: "Saved Sentences", id: "Kalimat Tersimpan" },
+  "hist.letterPredictions": { en: "Letter Predictions", id: "Prediksi Huruf" },
+  "hist.sentencesDesc": {
+    en: "These are sentences you intentionally saved. Click ▶ to hear them read aloud.",
+    id: "Kalimat yang Anda simpan dengan sengaja. Klik ▶ untuk mendengarkan.",
+  },
+  "hist.lettersDesc": {
+    en: "Every letter the ML model detected above the confidence threshold, grouped by session.",
+    id: "Setiap huruf yang dideteksi model ML di atas ambang kepercayaan, dikelompokkan per sesi.",
+  },
+  "hist.clearSentences": { en: "✕ Clear Sentences", id: "✕ Hapus Kalimat" },
+  "hist.clearLetters": { en: "✕ Clear Letters", id: "✕ Hapus Huruf" },
+  "hist.noSentences": {
+    en: "No saved sentences yet.",
+    id: "Belum ada kalimat tersimpan.",
+  },
+  "hist.noSentencesHint": {
+    en: "Use the Word Builder on the Recognizer page, then press Save Sentence.",
+    id: "Gunakan Pembuat Kata di halaman Penerjemah, lalu tekan Simpan Kalimat.",
+  },
+  "hist.noLetters": {
+    en: "No letter predictions yet.",
+    id: "Belum ada prediksi huruf.",
+  },
+  "hist.noLettersHint": {
+    en: "Start the camera on the Recognizer page and sign some letters.",
+    id: "Nyalakan kamera di halaman Penerjemah dan isyaratkan beberapa huruf.",
+  },
+  "hist.session": { en: "Session", id: "Sesi" },
+  "hist.letters": { en: "letters", id: "huruf" },
+  "hist.avg": { en: "avg", id: "rata-rata" },
+
+  // ── Dictionary page ───────────────────────────────────────────────────────
+  "dict.title": { en: "SIBI Dictionary", id: "Kamus SIBI" },
+  "dict.subtitle": {
+    en: "Indonesian Sign Language Alphabet · 26 Letters",
+    id: "Abjad Bahasa Isyarat Indonesia · 26 Huruf",
+  },
+  "dict.desc": {
+    en: "This dictionary contains visual references for all 26 SIBI alphabet signs. Click any card to view the full-size image and description. Use the search bar to find a specific letter.",
+    id: "Kamus ini berisi referensi visual untuk 26 isyarat abjad SIBI. Klik kartu untuk melihat gambar penuh. Gunakan bilah pencarian untuk menemukan huruf tertentu.",
+  },
+  "dict.search": {
+    en: "Search by letter or description...",
+    id: "Cari berdasarkan huruf atau deskripsi...",
+  },
+  "dict.noResults": {
+    en: "No letters matching",
+    id: "Tidak ada huruf yang cocok dengan",
+  },
+  "dict.howToAdd": {
+    en: "HOW TO ADD SIGN IMAGES",
+    id: "CARA MENAMBAHKAN GAMBAR ISYARAT",
+  },
+  "dict.addHint1": {
+    en: "Place your sign images in frontend/public/sibi/ named exactly A.png, B.png, etc.",
+    id: "Tempatkan gambar isyarat di frontend/public/sibi/ dengan nama A.png, B.png, dst.",
+  },
+  "dict.addHint2": {
+    en: "Images appear automatically on the matching card once added.",
+    id: "Gambar akan muncul otomatis pada kartu yang sesuai setelah ditambahkan.",
+  },
+  "dict.addHint3": {
+    en: "If an image is missing, the letter is shown as a placeholder.",
+    id: "Jika gambar tidak ada, huruf ditampilkan sebagai placeholder.",
+  },
+
+  // ── Settings page ─────────────────────────────────────────────────────────
+  "set.title": { en: "Settings", id: "Pengaturan" },
+  "set.subtitle": {
+    en: "Configure system behaviour · changes take effect immediately",
+    id: "Konfigurasi sistem · perubahan berlaku segera",
+  },
+  "set.appearance": { en: "APPEARANCE", id: "TAMPILAN" },
+  "set.mlSystem": { en: "ML & SYSTEM", id: "ML & SISTEM" },
+  "set.themeKey": { en: "interface_theme", id: "tema_antarmuka" },
+  "set.themeLabel": {
+    en: "Color scheme applied across all pages. Saved in the browser.",
+    id: "Skema warna yang diterapkan di semua halaman. Disimpan di browser.",
+  },
+  "set.darkMode": { en: "Dark Mode", id: "Mode Gelap" },
+  "set.lightMode": { en: "Light Mode", id: "Mode Terang" },
+  "set.fontSizeKey": { en: "display_font_size", id: "ukuran_font_tampilan" },
+  "set.fontSizeLabel": {
+    en: "Word Builder text size. Larger is easier to read across the counter.",
+    id: "Ukuran teks Pembuat Kata. Lebih besar lebih mudah dibaca dari jauh.",
+  },
+  "set.fontPreviewKey": { en: "font_preview", id: "pratinjau_font" },
+  "set.fontPreviewLabel": {
+    en: "Live preview of how the Word Builder text will appear.",
+    id: "Pratinjau langsung tampilan teks Pembuat Kata.",
+  },
+  "set.small": { en: "Small", id: "Kecil" },
+  "set.medium": { en: "Medium", id: "Sedang" },
+  "set.large": { en: "Large", id: "Besar" },
+  "set.xlarge": { en: "X-Large", id: "Ekstra Besar" },
+  "set.langKey": { en: "interface_language", id: "bahasa_antarmuka" },
+  "set.langLabel": {
+    en: "Display language for all UI text across the application.",
+    id: "Bahasa tampilan untuk semua teks antarmuka aplikasi.",
+  },
+  "set.howItWorks": { en: "HOW SETTINGS WORK", id: "CARA KERJA PENGATURAN" },
+  "set.save": { en: "Save", id: "Simpan" },
+  "set.saved": { en: "✓ Saved", id: "✓ Tersimpan" },
+  "set.loading": { en: "Loading settings...", id: "Memuat pengaturan..." },
+  "set.confThreshDesc": {
+    en: "predictions below this value are not saved to history",
+    id: "prediksi di bawah nilai ini tidak disimpan ke riwayat",
+  },
+  "set.confirmFramesDesc": {
+    en: "a letter must appear this many consecutive frames before being added",
+    id: "huruf harus muncul sebanyak ini frame berturut-turut sebelum ditambahkan",
+  },
+  "set.pollDesc": {
+    en: "how often a frame is sent to the ML service; lower = faster but heavier on CPU",
+    id: "seberapa sering frame dikirim ke layanan ML; lebih rendah = lebih cepat tapi lebih berat",
+  },
+  "set.modelDesc": {
+    en: "informational only; swap the actual file in ml-service/models/",
+    id: "hanya informasi; ganti file aktual di ml-service/models/",
+  },
+
+  // ── Admin auth ────────────────────────────────────────────────────────────
+  "auth.loginTitle": { en: "Admin Login", id: "Login Admin" },
+  "auth.loginSubtitle": {
+    en: "SIMBAsoloV3 · Dashboard Access",
+    id: "SIMBAsoloV3 · Akses Dasbor",
+  },
+  "auth.registerTitle": { en: "Create Admin Account", id: "Buat Akun Admin" },
+  "auth.registerSubtitle": {
+    en: "SIMBAsoloV3 · Dashboard Registration",
+    id: "SIMBAsoloV3 · Pendaftaran Dasbor",
+  },
+  "auth.username": { en: "Username", id: "Nama Pengguna" },
+  "auth.email": { en: "Email", id: "Email" },
+  "auth.password": { en: "Password", id: "Kata Sandi" },
+  "auth.confirmPassword": {
+    en: "Confirm Password",
+    id: "Konfirmasi Kata Sandi",
+  },
+  "auth.login": { en: "Login", id: "Masuk" },
+  "auth.loggingIn": { en: "Logging in...", id: "Sedang masuk..." },
+  "auth.createAccount": { en: "Create Account", id: "Buat Akun" },
+  "auth.creating": { en: "Creating account...", id: "Membuat akun..." },
+  "auth.noAccount": { en: "No account?", id: "Belum punya akun?" },
+  "auth.registerHere": { en: "Register here", id: "Daftar di sini" },
+  "auth.hasAccount": {
+    en: "Already have an account?",
+    id: "Sudah punya akun?",
+  },
+  "auth.loginHere": { en: "Login here", id: "Masuk di sini" },
+  "auth.usernamePlaceholder": {
+    en: "Choose a username",
+    id: "Pilih nama pengguna",
+  },
+  "auth.emailPlaceholder": {
+    en: "Enter email address",
+    id: "Masukkan alamat email",
+  },
+  "auth.passwordPlaceholder": {
+    en: "Min. 6 characters",
+    id: "Min. 6 karakter",
+  },
+  "auth.confirmPlaceholder": { en: "Repeat password", id: "Ulangi kata sandi" },
+  "auth.loginUserPlaceholder": {
+    en: "Enter username",
+    id: "Masukkan nama pengguna",
+  },
+  "auth.loginPassPlaceholder": {
+    en: "Enter password",
+    id: "Masukkan kata sandi",
+  },
+  "auth.passNoMatch": {
+    en: "Passwords do not match",
+    id: "Kata sandi tidak cocok",
+  },
+  "auth.passTooShort": {
+    en: "Password must be at least 6 characters",
+    id: "Kata sandi minimal 6 karakter",
+  },
+
+  // ── Admin Dashboard ───────────────────────────────────────────────────────
+  "dash.title": { en: "Admin Dashboard", id: "Dasbor Admin" },
+  "dash.loggedInAs": { en: "Logged in as", id: "Masuk sebagai" },
+  "dash.refresh": { en: "↻ Refresh", id: "↻ Segarkan" },
+  "dash.overview": { en: "Overview", id: "Ringkasan" },
+  "dash.predictions": { en: "Predictions", id: "Prediksi" },
+  "dash.sentences": { en: "Sentences", id: "Kalimat" },
+  "dash.settings": { en: "Settings", id: "Pengaturan" },
+  "dash.totalPredictions": { en: "Total Predictions", id: "Total Prediksi" },
+  "dash.sessions": { en: "Sessions", id: "Sesi" },
+  "dash.avgConfidence": { en: "Avg Confidence", id: "Kepercayaan Rata-rata" },
+  "dash.mostDetected": { en: "Most Detected", id: "Paling Terdeteksi" },
+  "dash.savedSentences": { en: "Saved Sentences", id: "Kalimat Tersimpan" },
+  "dash.topLetters": {
+    en: "TOP DETECTED LETTERS",
+    id: "HURUF PALING TERDETEKSI",
+  },
+  "dash.noData": {
+    en: "No prediction data yet. Start signing on the Recognizer page.",
+    id: "Belum ada data prediksi. Mulai isyaratkan di halaman Penerjemah.",
+  },
+  "dash.allPredictions": {
+    en: "All letter predictions recorded by the ML model above the confidence threshold.",
+    id: "Semua prediksi huruf yang direkam model ML di atas ambang kepercayaan.",
+  },
+  "dash.sentencesDesc": {
+    en: "Sentences saved by users from the Word Builder. Click ▶ to hear them read aloud.",
+    id: "Kalimat yang disimpan pengguna dari Pembuat Kata. Klik ▶ untuk mendengarkan.",
+  },
+  "dash.settingsDesc": {
+    en: "These settings are stored in SQLite and take effect immediately.",
+    id: "Pengaturan ini disimpan di SQLite dan berlaku segera.",
+  },
+  "dash.clearAll": { en: "✕ Clear All", id: "✕ Hapus Semua" },
+  "dash.noPredictions": {
+    en: "No predictions yet.",
+    id: "Belum ada prediksi.",
+  },
+  "dash.noSentences": {
+    en: "No saved sentences yet.",
+    id: "Belum ada kalimat tersimpan.",
+  },
+  "dash.loading": { en: "Loading dashboard...", id: "Memuat dasbor..." },
+  "dash.id": { en: "ID", id: "ID" },
+  "dash.letter": { en: "Letter", id: "Huruf" },
+  "dash.confidence": { en: "Confidence", id: "Kepercayaan" },
+  "dash.session": { en: "Session", id: "Sesi" },
+  "dash.time": { en: "Time", id: "Waktu" },
+  "dash.deleteConfirmPred": {
+    en: "Delete all prediction history?",
+    id: "Hapus semua riwayat prediksi?",
+  },
+  "dash.deleteConfirmSent": {
+    en: "Delete all saved sentences?",
+    id: "Hapus semua kalimat tersimpan?",
+  },
+
+  // ── Shared ────────────────────────────────────────────────────────────────
+  "common.loading": { en: "Loading...", id: "Memuat..." },
+  "common.noData": { en: "No data yet.", id: "Belum ada data." },
+} as const;
+
+export type TranslationKey = keyof typeof translations;

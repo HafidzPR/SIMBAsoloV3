@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { adminLogin } from "../api/client";
+import { useLang } from "../i18n/LanguageContext";
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
+  const { t } = useLang();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,45 +32,42 @@ export function AdminLoginPage() {
       <div className="auth-card">
         <div className="auth-header">
           <div className="auth-logo">S</div>
-          <h1 className="auth-title">Admin Login</h1>
-          <p className="auth-subtitle">SIMBAsoloV3 · Dashboard Access</p>
+          <h1 className="auth-title">{t("auth.loginTitle")}</h1>
+          <p className="auth-subtitle">{t("auth.loginSubtitle")}</p>
         </div>
-
         {error && <p className="error-banner">{error}</p>}
-
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label className="auth-label">Username</label>
+            <label className="auth-label">{t("auth.username")}</label>
             <input
               className="auth-input"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
+              placeholder={t("auth.loginUserPlaceholder")}
               required
               autoFocus
             />
           </div>
           <div className="auth-field">
-            <label className="auth-label">Password</label>
+            <label className="auth-label">{t("auth.password")}</label>
             <input
               className="auth-input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
+              placeholder={t("auth.loginPassPlaceholder")}
               required
             />
           </div>
           <button className="auth-btn" type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+            {loading ? t("auth.loggingIn") : t("auth.login")}
           </button>
         </form>
-
         <p className="auth-footer">
-          No account?{" "}
+          {t("auth.noAccount")}{" "}
           <Link to="/admin/register" className="auth-link">
-            Register here
+            {t("auth.registerHere")}
           </Link>
         </p>
       </div>

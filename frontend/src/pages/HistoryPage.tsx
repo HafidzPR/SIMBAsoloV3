@@ -5,6 +5,7 @@ import {
   getSentences,
   deleteSentences,
 } from "../api/client";
+import { useLang } from "../i18n/LanguageContext";
 import type { HistoryItem } from "../types";
 
 interface SavedSentence {
@@ -26,6 +27,7 @@ function speak(text: string) {
 }
 
 export function HistoryPage() {
+  const { t } = useLang();
   const [tab, setTab] = useState<Tab>("sentences");
   const [sentences, setSentences] = useState<SavedSentence[]>([]);
   const [letters, setLetters] = useState<HistoryItem[]>([]);
@@ -52,7 +54,7 @@ export function HistoryPage() {
   }, []);
 
   const handleClearSentences = async () => {
-    if (!confirm("Delete all saved sentences?")) return;
+    if (!confirm(t("dash.deleteConfirmSent"))) return;
     try {
       await deleteSentences();
       setSentences([]);
@@ -62,7 +64,7 @@ export function HistoryPage() {
   };
 
   const handleClearLetters = async () => {
-    if (!confirm("Delete all letter prediction history?")) return;
+    if (!confirm(t("dash.deleteConfirmPred"))) return;
     try {
       await deleteHistory();
       setLetters([]);
@@ -83,7 +85,6 @@ export function HistoryPage() {
     (s) =>
       !filter.trim() || s.text.toLowerCase().includes(filter.toLowerCase()),
   );
-
   const filteredSessions = Object.entries(bySession).filter(([, rows]) => {
     if (!filter.trim()) return true;
     return rows
@@ -97,10 +98,9 @@ export function HistoryPage() {
     <div className="page history-page">
       <div className="history-header">
         <div>
-          <h1 className="page-title">History</h1>
+          <h1 className="page-title">{t("hist.title")}</h1>
           <p className="page-subtitle">
-            {sentences.length} saved sentences · {letters.length} letter
-            predictions
+            {t("hist.subtitle", { s: sentences.length, l: letters.length })}
           </p>
         </div>
         <div className="page-actions">
@@ -109,32 +109,8 @@ export function HistoryPage() {
             onClick={loadAll}
             disabled={loading}
           >
-            ↻ Refresh
+            {t("hist.refresh")}
           </button>
-        </div>
-      </div>
-
-      <div className="history-desc">
-        <div className="history-desc-item">
-          <span
-            className="history-desc-dot"
-            style={{ background: "var(--accent)" }}
-          />
-          <div>
-            <strong>Saved Sentences</strong> — words and phrases you formed in
-            the Word Builder and saved with the Save Sentence button.
-          </div>
-        </div>
-        <div className="history-desc-item">
-          <span
-            className="history-desc-dot"
-            style={{ background: "var(--accent-dim)" }}
-          />
-          <div>
-            <strong>Letter Predictions</strong> — every individual letter
-            detected by the ML model above the confidence threshold, grouped by
-            session.
-          </div>
         </div>
       </div>
 
@@ -143,7 +119,7 @@ export function HistoryPage() {
       <div className="history-search">
         <input
           className="history-search-input"
-          placeholder="Filter..."
+          placeholder={t("hist.filter")}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
@@ -162,44 +138,36 @@ export function HistoryPage() {
           className={`history-tab${tab === "sentences" ? " history-tab--active" : ""}`}
           onClick={() => setTab("sentences")}
         >
-          Saved Sentences
+          {t("hist.savedSentences")}{" "}
           <span className="history-tab-count">{sentences.length}</span>
         </button>
         <button
           className={`history-tab${tab === "letters" ? " history-tab--active" : ""}`}
           onClick={() => setTab("letters")}
         >
-          Letter Predictions
+          {t("hist.letterPredictions")}{" "}
           <span className="history-tab-count">{letters.length}</span>
         </button>
       </div>
 
       {loading ? (
-        <div className="loading-state">Loading...</div>
+        <div className="loading-state">{t("common.loading")}</div>
       ) : tab === "sentences" ? (
-        /* ── SENTENCES TAB ───────────────────────────────────────────── */
         <div>
           <div className="history-tab-header">
-            <p className="history-tab-desc">
-              These are sentences you intentionally saved. Click ▶ to hear them
-              read aloud.
-            </p>
+            <p className="history-tab-desc">{t("hist.sentencesDesc")}</p>
             <button
               className="btn-danger"
               onClick={handleClearSentences}
               disabled={sentences.length === 0}
             >
-              ✕ Clear Sentences
+              {t("hist.clearSentences")}
             </button>
           </div>
-
           {filteredSentences.length === 0 ? (
             <div className="empty-state">
-              <p>No saved sentences yet.</p>
-              <p>
-                Use the Word Builder on the Recognizer page, then press Save
-                Sentence.
-              </p>
+              <p>{t("hist.noSentences")}</p>
+              <p>{t("hist.noSentencesHint")}</p>
             </div>
           ) : (
             <div className="sentences-list">
@@ -211,7 +179,7 @@ export function HistoryPage() {
                   <div className="sentence-row-main">
                     <span className="sentence-row-text">{s.text}</span>
                     <span className="sentence-row-session">
-                      Session {s.session_id.slice(-5)}
+                      {t("hist.session")} {s.session_id.slice(-5)}
                     </span>
                   </div>
                   <div className="sentence-row-right">
@@ -221,7 +189,7 @@ export function HistoryPage() {
                     <button
                       className="btn-tts-small"
                       onClick={() => speak(s.text)}
-                      title="Read aloud"
+                      title={t("rec.speak")}
                     >
                       ▶
                     </button>
@@ -232,28 +200,21 @@ export function HistoryPage() {
           )}
         </div>
       ) : (
-        /* ── LETTERS TAB ─────────────────────────────────────────────── */
         <div>
           <div className="history-tab-header">
-            <p className="history-tab-desc">
-              Every letter the ML model detected above the confidence threshold,
-              grouped by session.
-            </p>
+            <p className="history-tab-desc">{t("hist.lettersDesc")}</p>
             <button
               className="btn-danger"
               onClick={handleClearLetters}
               disabled={letters.length === 0}
             >
-              ✕ Clear Letters
+              {t("hist.clearLetters")}
             </button>
           </div>
-
           {filteredSessions.length === 0 ? (
             <div className="empty-state">
-              <p>No letter predictions yet.</p>
-              <p>
-                Start the camera on the Recognizer page and sign some letters.
-              </p>
+              <p>{t("hist.noLetters")}</p>
+              <p>{t("hist.noLettersHint")}</p>
             </div>
           ) : (
             <div className="history-sessions">
@@ -270,18 +231,20 @@ export function HistoryPage() {
                       <div className="session-header-left">
                         <span className="session-word">{word || "—"}</span>
                         <span className="session-badge">
-                          {rows.length} letters
+                          {rows.length} {t("hist.letters")}
                         </span>
                       </div>
                       <div className="session-header-right">
                         <button
                           className="btn-tts-small"
                           onClick={() => speak(word)}
-                          title="Read aloud"
+                          title={t("rec.speak")}
                         >
                           ▶
                         </button>
-                        <span className="session-avgconf">avg {avgConf}%</span>
+                        <span className="session-avgconf">
+                          {t("hist.avg")} {avgConf}%
+                        </span>
                         <span className="session-meta">
                           {earliest ? new Date(earliest).toLocaleString() : ""}
                         </span>
@@ -291,10 +254,10 @@ export function HistoryPage() {
                       <table className="history-table">
                         <thead>
                           <tr>
-                            <th>ID</th>
-                            <th>Letter</th>
-                            <th>Confidence</th>
-                            <th>Time</th>
+                            <th>{t("dash.id")}</th>
+                            <th>{t("dash.letter")}</th>
+                            <th>{t("dash.confidence")}</th>
+                            <th>{t("dash.time")}</th>
                           </tr>
                         </thead>
                         <tbody>

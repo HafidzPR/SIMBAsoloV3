@@ -1,93 +1,188 @@
 import { useState } from "react";
+import { useLang } from "../i18n/LanguageContext";
 
 interface SignEntry {
   letter: string;
-  description: string;
+  descEn: string;
+  descId: string;
   imagePath: string;
 }
 
-function getSIBIDescription(letter: string): string {
-  const descriptions: Record<string, string> = {
-    A: "Closed fist with thumb resting on the side",
-    B: "Four fingers straight up, thumb folded across palm",
-    C: "Hand curved to form the letter C",
-    D: "Index finger pointing up, other fingers form a circle",
-    E: "All fingers curled downward toward palm",
-    F: "Thumb and index form a circle, other fingers straight",
-    G: "Index finger and thumb pointing sideways",
-    H: "Index and middle fingers extended sideways together",
-    I: "Pinky finger pointing straight up",
-    J: "Pinky pointing up, trace the letter J in the air",
-    K: "Index and middle pointing up with thumb between them",
-    L: "Thumb and index finger form an L shape",
-    M: "Three fingers folded over the thumb",
-    N: "Two fingers folded over the thumb",
-    O: "All fingers curved to form the letter O",
-    P: "Like K but pointing downward",
-    Q: "Like G but pointing downward",
-    R: "Index and middle fingers crossed",
-    S: "Closed fist with thumb over the fingers",
-    T: "Thumb tucked between index and middle fingers",
-    U: "Index and middle fingers straight up together",
-    V: "Index and middle fingers spread apart in a V",
-    W: "Three fingers (index, middle, ring) spread open",
-    X: "Index finger bent like a hook",
-    Y: "Thumb and pinky extended outward",
-    Z: "Index finger traces the letter Z in the air",
-  };
-  return descriptions[letter] || `SIBI sign for letter ${letter}`;
-}
-
-const SIGNS: SignEntry[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  .split("")
-  .map((letter) => ({
-    letter,
-    description: getSIBIDescription(letter),
-    imagePath: `/sibi/${letter}.png`,
-  }));
+const SIGN_DATA: SignEntry[] = [
+  {
+    letter: "A",
+    descEn: "Closed fist with thumb resting on the side",
+    descId: "Kepalan tangan dengan ibu jari di sisi",
+  },
+  {
+    letter: "B",
+    descEn: "Four fingers straight up, thumb folded across palm",
+    descId: "Empat jari lurus ke atas, ibu jari dilipat ke telapak",
+  },
+  {
+    letter: "C",
+    descEn: "Hand curved to form the letter C",
+    descId: "Tangan melengkung membentuk huruf C",
+  },
+  {
+    letter: "D",
+    descEn: "Index finger pointing up, other fingers form a circle",
+    descId: "Jari telunjuk lurus ke atas, jari lain membentuk lingkaran",
+  },
+  {
+    letter: "E",
+    descEn: "All fingers curled downward toward palm",
+    descId: "Semua jari ditekuk ke bawah menuju telapak",
+  },
+  {
+    letter: "F",
+    descEn: "Thumb and index form a circle, other fingers straight",
+    descId: "Ibu jari dan telunjuk membentuk lingkaran, jari lain lurus",
+  },
+  {
+    letter: "G",
+    descEn: "Index finger and thumb pointing sideways",
+    descId: "Jari telunjuk dan ibu jari menunjuk ke samping",
+  },
+  {
+    letter: "H",
+    descEn: "Index and middle fingers extended sideways together",
+    descId: "Jari telunjuk dan tengah lurus ke samping",
+  },
+  {
+    letter: "I",
+    descEn: "Pinky finger pointing straight up",
+    descId: "Kelingking lurus ke atas",
+  },
+  {
+    letter: "J",
+    descEn: "Pinky pointing up, trace the letter J in the air",
+    descId: "Kelingking lurus, buat gerakan huruf J di udara",
+  },
+  {
+    letter: "K",
+    descEn: "Index and middle pointing up with thumb between them",
+    descId: "Telunjuk dan tengah ke atas dengan ibu jari di tengah",
+  },
+  {
+    letter: "L",
+    descEn: "Thumb and index finger form an L shape",
+    descId: "Ibu jari dan telunjuk membentuk sudut L",
+  },
+  {
+    letter: "M",
+    descEn: "Three fingers folded over the thumb",
+    descId: "Tiga jari ditekuk di atas ibu jari",
+  },
+  {
+    letter: "N",
+    descEn: "Two fingers folded over the thumb",
+    descId: "Dua jari ditekuk di atas ibu jari",
+  },
+  {
+    letter: "O",
+    descEn: "All fingers curved to form the letter O",
+    descId: "Semua jari membentuk lingkaran O",
+  },
+  {
+    letter: "P",
+    descEn: "Like K but pointing downward",
+    descId: "Seperti K tapi menunjuk ke bawah",
+  },
+  {
+    letter: "Q",
+    descEn: "Like G but pointing downward",
+    descId: "Seperti G tapi menunjuk ke bawah",
+  },
+  {
+    letter: "R",
+    descEn: "Index and middle fingers crossed",
+    descId: "Jari telunjuk dan tengah bersilang",
+  },
+  {
+    letter: "S",
+    descEn: "Closed fist with thumb over the fingers",
+    descId: "Kepalan tangan dengan ibu jari di depan",
+  },
+  {
+    letter: "T",
+    descEn: "Thumb tucked between index and middle fingers",
+    descId: "Ibu jari diantara telunjuk dan jari tengah",
+  },
+  {
+    letter: "U",
+    descEn: "Index and middle fingers straight up together",
+    descId: "Telunjuk dan tengah lurus berdampingan",
+  },
+  {
+    letter: "V",
+    descEn: "Index and middle fingers spread apart in a V",
+    descId: "Telunjuk dan tengah membentuk V",
+  },
+  {
+    letter: "W",
+    descEn: "Three fingers (index, middle, ring) spread open",
+    descId: "Tiga jari (telunjuk, tengah, manis) terbuka",
+  },
+  {
+    letter: "X",
+    descEn: "Index finger bent like a hook",
+    descId: "Telunjuk melengkung seperti kail",
+  },
+  {
+    letter: "Y",
+    descEn: "Thumb and pinky extended outward",
+    descId: "Ibu jari dan kelingking terbuka",
+  },
+  {
+    letter: "Z",
+    descEn: "Index finger traces the letter Z in the air",
+    descId: "Telunjuk membuat gerakan Z di udara",
+  },
+].map((s) => ({ ...s, imagePath: `/sibi/${s.letter}.png` }));
 
 export function DictionaryPage() {
+  const { t, lang } = useLang();
   const [search, setSearch] = useState("");
-  const [modal, setModal] = useState<SignEntry | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
 
-  const filtered = SIGNS.filter(
+  const getDesc = (sign: SignEntry) =>
+    lang === "id" ? sign.descId : sign.descEn;
+
+  const filtered = SIGN_DATA.filter(
     (s) =>
       s.letter.toLowerCase().includes(search.toLowerCase()) ||
-      s.description.toLowerCase().includes(search.toLowerCase()),
+      getDesc(s).toLowerCase().includes(search.toLowerCase()),
   );
 
-  const handleImgError = (letter: string) => {
+  const handleImgError = (letter: string) =>
     setImgError((prev) => ({ ...prev, [letter]: true }));
-  };
 
-  // Navigate between letters in the modal
-  const currentIndex = modal
-    ? SIGNS.findIndex((s) => s.letter === modal.letter)
+  const currentIndex = selected
+    ? SIGN_DATA.findIndex((s) => s.letter === selected)
     : -1;
   const goPrev = () => {
-    if (currentIndex > 0) setModal(SIGNS[currentIndex - 1]);
+    if (currentIndex > 0) setSelected(SIGN_DATA[currentIndex - 1].letter);
   };
   const goNext = () => {
-    if (currentIndex < SIGNS.length - 1) setModal(SIGNS[currentIndex + 1]);
+    if (currentIndex < SIGN_DATA.length - 1)
+      setSelected(SIGN_DATA[currentIndex + 1].letter);
   };
+  const modalSign = selected
+    ? SIGN_DATA.find((s) => s.letter === selected)
+    : null;
 
   return (
     <div className="page dictionary-page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">SIBI Dictionary</h1>
-          <p className="page-subtitle">
-            Indonesian Sign Language Alphabet · 26 Letters
-          </p>
+          <h1 className="page-title">{t("dict.title")}</h1>
+          <p className="page-subtitle">{t("dict.subtitle")}</p>
         </div>
       </div>
 
-      <div className="dict-desc">
-        This dictionary contains visual references for all 26 SIBI alphabet
-        signs. Click any card to view the full-size image and description. Use
-        the search bar to find a specific letter.
-      </div>
+      <div className="dict-desc">{t("dict.desc")}</div>
 
       <div
         className="history-search"
@@ -95,7 +190,7 @@ export function DictionaryPage() {
       >
         <input
           className="history-search-input"
-          placeholder="Search by letter or description..."
+          placeholder={t("dict.search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -109,13 +204,12 @@ export function DictionaryPage() {
         )}
       </div>
 
-      {/* Grid */}
       <div className="dict-grid">
         {filtered.map((sign) => (
           <div
             key={sign.letter}
             className="dict-card"
-            onClick={() => setModal(sign)}
+            onClick={() => setSelected(sign.letter)}
           >
             <div className="dict-card-img-wrap">
               {imgError[sign.letter] ? (
@@ -123,86 +217,77 @@ export function DictionaryPage() {
               ) : (
                 <img
                   src={sign.imagePath}
-                  alt={`SIBI sign for letter ${sign.letter}`}
+                  alt={`SIBI ${sign.letter}`}
                   className="dict-card-img"
                   onError={() => handleImgError(sign.letter)}
                 />
               )}
             </div>
             <div className="dict-card-letter">{sign.letter}</div>
-            <div className="dict-card-desc">{sign.description}</div>
+            <div className="dict-card-desc">{getDesc(sign)}</div>
           </div>
         ))}
       </div>
 
       {filtered.length === 0 && (
         <div className="empty-state">
-          <p>No letters matching "{search}"</p>
+          <p>
+            {t("dict.noResults")} "{search}"
+          </p>
         </div>
       )}
 
       <div className="dict-instructions">
-        <p className="settings-info-title">HOW TO ADD SIGN IMAGES</p>
+        <p className="settings-info-title">{t("dict.howToAdd")}</p>
         <ul className="settings-info-list">
-          <li>
-            Place your sign images in <code>frontend/public/sibi/</code> named
-            exactly <code>A.png</code>, <code>B.png</code>, etc.
-          </li>
-          <li>Images appear automatically on the matching card once added.</li>
-          <li>If an image is missing, the letter is shown as a placeholder.</li>
+          <li>{t("dict.addHint1")}</li>
+          <li>{t("dict.addHint2")}</li>
+          <li>{t("dict.addHint3")}</li>
         </ul>
       </div>
 
-      {/* Modal */}
-      {modal && (
-        <div className="dict-modal-overlay" onClick={() => setModal(null)}>
+      {modalSign && (
+        <div className="dict-modal-overlay" onClick={() => setSelected(null)}>
           <div className="dict-modal" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
             <div className="dict-modal-header">
-              <span className="dict-modal-letter">{modal.letter}</span>
+              <span className="dict-modal-letter">{modalSign.letter}</span>
               <button
                 className="dict-modal-close"
-                onClick={() => setModal(null)}
+                onClick={() => setSelected(null)}
               >
                 ✕
               </button>
             </div>
-
-            {/* Image */}
             <div className="dict-modal-img-wrap">
-              {imgError[modal.letter] ? (
-                <div className="dict-modal-placeholder">{modal.letter}</div>
+              {imgError[modalSign.letter] ? (
+                <div className="dict-modal-placeholder">{modalSign.letter}</div>
               ) : (
                 <img
-                  src={modal.imagePath}
-                  alt={`SIBI sign for letter ${modal.letter}`}
+                  src={modalSign.imagePath}
+                  alt={`SIBI ${modalSign.letter}`}
                   className="dict-modal-img"
-                  onError={() => handleImgError(modal.letter)}
+                  onError={() => handleImgError(modalSign.letter)}
                 />
               )}
             </div>
-
-            {/* Description */}
-            <p className="dict-modal-desc">{modal.description}</p>
-
-            {/* Navigation */}
+            <p className="dict-modal-desc">{getDesc(modalSign)}</p>
             <div className="dict-modal-nav">
               <button
                 className="dict-modal-nav-btn"
                 onClick={goPrev}
                 disabled={currentIndex === 0}
               >
-                ← Prev
+                ← {lang === "id" ? "Sebelumnya" : "Prev"}
               </button>
               <span className="dict-modal-nav-pos">
-                {currentIndex + 1} / {SIGNS.length}
+                {currentIndex + 1} / {SIGN_DATA.length}
               </span>
               <button
                 className="dict-modal-nav-btn"
                 onClick={goNext}
-                disabled={currentIndex === SIGNS.length - 1}
+                disabled={currentIndex === SIGN_DATA.length - 1}
               >
-                Next →
+                {lang === "id" ? "Berikutnya" : "Next"} →
               </button>
             </div>
           </div>

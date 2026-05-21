@@ -2020,3 +2020,33 @@ body {
 .conf-warning-text--visible {
   opacity: 1;
 }
+/* ── Language toggle in navbar ───────────────────────────────────────────── */
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-dim);
+  border-radius: 100px;
+  padding: 2px;
+}
+.lang-btn {
+  background: none;
+  border: none;
+  border-radius: 100px;
+  padding: 4px 8px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+  line-height: 1;
+}
+.lang-btn:hover {
+  opacity: 0.7;
+}
+.lang-btn--active {
+  opacity: 1;
+  background: var(--accent-glow);
+}

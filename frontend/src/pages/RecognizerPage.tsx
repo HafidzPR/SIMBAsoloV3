@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useWebcam } from "../hooks/useWebcam";
 import { usePredictor } from "../hooks/usePredictor";
-import type { PredictionStatus } from "../hooks/usePredictor";
 import { LandmarkOverlay } from "../components/LandmarkOverlay";
+import { useLang } from "../i18n/LanguageContext";
 import type { RecentSentence } from "../App";
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -32,6 +32,7 @@ interface Props {
 }
 
 export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
+  const { t } = useLang();
   const sessionId = useRef(makeSessionId()).current;
   const overlayRef = useRef<HTMLCanvasElement>(null);
 
@@ -82,7 +83,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
         await start();
         startPolling();
       } catch {
-        setCamError("Camera access denied. Please allow camera permissions.");
+        setCamError(t("err.cameraDenied"));
       }
     }
   };
@@ -105,13 +106,13 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
 
   const scanText =
     status === "analyzing"
-      ? "ANALYZING..."
+      ? t("rec.analyzing")
       : status === "translating"
-        ? "TRANSLATING..."
+        ? t("rec.translating")
         : status === "done"
-          ? "DONE"
+          ? t("rec.done")
           : active
-            ? "SCANNING"
+            ? t("rec.scanning")
             : "";
 
   const scanClass =
@@ -123,14 +124,12 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
           ? "cam-scanning cam-scanning--done"
           : "cam-scanning";
 
-  // Simple camera on/off dot only
   const dotClass = active ? "status-dot status-dot--on" : "status-dot";
-  const dotLabel = active ? "Camera active" : "Camera off";
+  const dotLabel = active ? t("rec.cameraActive") : t("rec.cameraOff");
 
   return (
     <div className="page recognizer-page">
       <div className="recognizer-grid">
-        {/* ── LEFT: Camera ─────────────────────────────────────────── */}
         <div className="cam-col">
           <div className="cam-frame">
             <video
@@ -156,11 +155,11 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
             {!active && (
               <div className="cam-idle">
                 <div className="cam-idle-icon">◉</div>
-                <p>Camera inactive</p>
+                <p>{t("rec.cameraInactive")}</p>
               </div>
             )}
             {active && !handDetected && status !== "error" && (
-              <div className="cam-hint">Show your hand</div>
+              <div className="cam-hint">{t("rec.showHand")}</div>
             )}
             {active && scanText && <div className={scanClass}>{scanText}</div>}
           </div>
@@ -169,7 +168,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
             <div className="status-notification status-notification--error">
               <span className="status-notification-icon">⚠</span>
               <div>
-                <strong>Camera Error</strong>
+                <strong>{t("err.cameraError")}</strong>
                 <p>{camError ?? error}</p>
               </div>
             </div>
@@ -178,11 +177,9 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
             <div className="status-notification status-notification--error">
               <span className="status-notification-icon">⚠</span>
               <div>
-                <strong>Connection Error</strong>
+                <strong>{t("err.connectionError")}</strong>
                 <p>{apiError}</p>
-                <p className="status-notification-hint">
-                  Check that the ML service is running on port 8001.
-                </p>
+                <p className="status-notification-hint">{t("err.mlHint")}</p>
               </div>
             </div>
           )}
@@ -191,10 +188,9 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
             className={`btn-cam${active ? " btn-cam--stop" : " btn-cam--start"}`}
             onClick={handleToggle}
           >
-            {active ? "Stop Camera" : "Start Camera"}
+            {active ? t("rec.stopCamera") : t("rec.startCamera")}
           </button>
 
-          {/* Simple camera on/off status only */}
           <div className="status-bar">
             <span className={dotClass} />
             <span className="status-label">{dotLabel}</span>
@@ -202,7 +198,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
 
           {recentSentences.length > 0 && (
             <div className="recent-card">
-              <span className="card-eyebrow">RECENT SENTENCES</span>
+              <span className="card-eyebrow">{t("rec.recentSentences")}</span>
               <ul className="recent-list">
                 {recentSentences.map((s) => (
                   <li key={s.id} className="recent-item">
@@ -212,7 +208,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
                       <button
                         className="btn-tts-small"
                         onClick={() => speak(s.text)}
-                        title="Read aloud"
+                        title={t("rec.speak")}
                       >
                         ▶
                       </button>
@@ -224,16 +220,14 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
           )}
         </div>
 
-        {/* ── RIGHT ─────────────────────────────────────────────────── */}
         <div className="right-col">
-          {/* Letter card — low conf shown inline WITHOUT border change */}
           <div className="letter-card">
             <div className="letter-card-header">
-              <span className="card-eyebrow">LIVE DETECTION</span>
+              <span className="card-eyebrow">{t("rec.liveDetection")}</span>
               <span
                 className={`conf-warn-badge${showLowConf ? " conf-warn-badge--visible" : ""}`}
               >
-                Low confidence · {liveConf}%
+                {t("rec.lowConfidence")} · {liveConf}%
               </span>
             </div>
             <div className="letter-display">
@@ -255,12 +249,12 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
             <p
               className={`conf-warning-text${showLowConf ? " conf-warning-text--visible" : ""}`}
             >
-              Adjust hand position or lighting for better accuracy
+              {t("rec.adjustHand")}
             </p>
           </div>
 
           <div className="top3-card">
-            <span className="card-eyebrow">TOP CANDIDATES</span>
+            <span className="card-eyebrow">{t("rec.topCandidates")}</span>
             {handDetected && (result?.top3?.length ?? 0) > 0 ? (
               result!.top3.map((p) => (
                 <div key={p.letter} className="top3-row">
@@ -277,7 +271,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
                 </div>
               ))
             ) : (
-              <div className="top3-empty">Waiting for detection...</div>
+              <div className="top3-empty">{t("rec.waitingDetection")}</div>
             )}
           </div>
 
@@ -285,9 +279,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
             {ALPHABET.map((l) => (
               <span
                 key={l}
-                className={`alpha-cell${
-                  l === liveLetter && handDetected ? " alpha-cell--lit" : ""
-                }`}
+                className={`alpha-cell${l === liveLetter && handDetected ? " alpha-cell--lit" : ""}`}
               >
                 {l}
               </span>
@@ -295,7 +287,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
           </div>
 
           <div className="builder-card">
-            <span className="card-eyebrow">WORD BUILDER</span>
+            <span className="card-eyebrow">{t("rec.wordBuilder")}</span>
             <div
               className="builder-display"
               style={{ fontSize: `${fontSize}px` }}
@@ -307,7 +299,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
                 </>
               ) : (
                 <span className="builder-placeholder">
-                  Sign letters to begin...
+                  {t("rec.signToBegin")}
                 </span>
               )}
             </div>
@@ -317,28 +309,28 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
                 onClick={deleteLetter}
                 disabled={!word}
               >
-                ⌫ Delete
+                {t("rec.delete")}
               </button>
               <button
                 className="btn-action"
                 onClick={addSpace}
                 disabled={!word}
               >
-                ␣ Space
+                {t("rec.space")}
               </button>
               <button
                 className="btn-action btn-action--clear"
                 onClick={clearWord}
                 disabled={!word}
               >
-                ✕ Clear
+                {t("rec.clear")}
               </button>
               <button
                 className="btn-action btn-action--tts"
                 onClick={speakWord}
                 disabled={!word.trim()}
               >
-                ▶ Speak
+                {t("rec.speak")}
               </button>
             </div>
             <button
@@ -346,7 +338,7 @@ export function RecognizerPage({ recentSentences, onSaveSentence }: Props) {
               onClick={saveSentence}
               disabled={!word.trim()}
             >
-              ✓ Save Sentence
+              {t("rec.saveSentence")}
             </button>
           </div>
         </div>

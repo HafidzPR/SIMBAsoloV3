@@ -10,6 +10,7 @@ import {
   getSettings,
   putSetting,
 } from "../api/client";
+import { useLang } from "../i18n/LanguageContext";
 import type { AdminStats, HistoryItem, SettingItem } from "../types";
 
 interface SentenceItem {
@@ -18,12 +19,10 @@ interface SentenceItem {
   timestamp: string;
   session_id: string;
 }
-
 interface LetterFreqItem {
   letter: string;
   count: number;
 }
-
 type Tab = "overview" | "history" | "sentences" | "settings";
 
 const BAR_COLORS = [
@@ -48,6 +47,7 @@ function speakText(text: string) {
 
 export function AdminDashboardPage() {
   const navigate = useNavigate();
+  const { t } = useLang();
   const [tab, setTab] = useState<Tab>("overview");
   const [adminName, setAdminName] = useState("");
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -111,47 +111,48 @@ export function AdminDashboardPage() {
     }
   };
 
-  const tabList: { id: Tab; label: string }[] = [
-    { id: "overview", label: "Overview" },
-    { id: "history", label: `Predictions (${history.length})` },
-    { id: "sentences", label: `Sentences (${sentences.length})` },
-    { id: "settings", label: "Settings" },
-  ];
-
   const maxCount = freq.length > 0 ? Math.max(...freq.map((f) => f.count)) : 1;
   const top10 = freq.slice(0, 10);
+
+  const tabList: { id: Tab; label: string }[] = [
+    { id: "overview", label: t("dash.overview") },
+    { id: "history", label: `${t("dash.predictions")} (${history.length})` },
+    { id: "sentences", label: `${t("dash.sentences")} (${sentences.length})` },
+    { id: "settings", label: t("dash.settings") },
+  ];
 
   return (
     <div className="page admin-dashboard">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Admin Dashboard</h1>
-          <p className="page-subtitle">Logged in as {adminName}</p>
+          <h1 className="page-title">{t("dash.title")}</h1>
+          <p className="page-subtitle">
+            {t("dash.loggedInAs")} {adminName}
+          </p>
         </div>
         <button className="btn-secondary" onClick={loadAll} disabled={loading}>
-          ↻ Refresh
+          {t("dash.refresh")}
         </button>
       </div>
 
       {error && <p className="error-banner">{error}</p>}
 
       <div className="history-tabs" style={{ marginBottom: 24 }}>
-        {tabList.map((t) => (
+        {tabList.map((tab_item) => (
           <button
-            key={t.id}
-            className={`history-tab${tab === t.id ? " history-tab--active" : ""}`}
-            onClick={() => setTab(t.id)}
+            key={tab_item.id}
+            className={`history-tab${tab === tab_item.id ? " history-tab--active" : ""}`}
+            onClick={() => setTab(tab_item.id)}
           >
-            {t.label}
+            {tab_item.label}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div className="loading-state">Loading dashboard...</div>
+        <div className="loading-state">{t("dash.loading")}</div>
       ) : (
         <>
-          {/* ── Overview ─────────────────────────────────────────────── */}
           {tab === "overview" && stats && (
             <div>
               <div className="dash-stats-grid">
@@ -159,38 +160,45 @@ export function AdminDashboardPage() {
                   <span className="dash-stat-value">
                     {stats.total_predictions}
                   </span>
-                  <span className="dash-stat-label">Total Predictions</span>
+                  <span className="dash-stat-label">
+                    {t("dash.totalPredictions")}
+                  </span>
                 </div>
                 <div className="dash-stat-card">
                   <span className="dash-stat-value">
                     {stats.total_sessions}
                   </span>
-                  <span className="dash-stat-label">Sessions</span>
+                  <span className="dash-stat-label">{t("dash.sessions")}</span>
                 </div>
                 <div className="dash-stat-card">
                   <span className="dash-stat-value">
                     {Math.round(stats.avg_confidence * 100)}%
                   </span>
-                  <span className="dash-stat-label">Avg Confidence</span>
+                  <span className="dash-stat-label">
+                    {t("dash.avgConfidence")}
+                  </span>
                 </div>
                 <div className="dash-stat-card">
                   <span className="dash-stat-value dash-stat-letter">
                     {stats.top_letter}
                   </span>
-                  <span className="dash-stat-label">Most Detected</span>
+                  <span className="dash-stat-label">
+                    {t("dash.mostDetected")}
+                  </span>
                 </div>
                 <div className="dash-stat-card">
                   <span className="dash-stat-value">
                     {stats.total_sentences}
                   </span>
-                  <span className="dash-stat-label">Saved Sentences</span>
+                  <span className="dash-stat-label">
+                    {t("dash.savedSentences")}
+                  </span>
                 </div>
               </div>
-
               {top10.length > 0 ? (
                 <div className="dash-chart-card">
                   <p className="card-eyebrow" style={{ marginBottom: 20 }}>
-                    TOP DETECTED LETTERS
+                    {t("dash.topLetters")}
                   </p>
                   <div className="dash-chart">
                     {top10.map((item, i) => (
@@ -213,45 +221,41 @@ export function AdminDashboardPage() {
                 </div>
               ) : (
                 <div className="empty-state" style={{ marginTop: 24 }}>
-                  No prediction data yet. Start signing on the Recognizer page.
+                  {t("dash.noData")}
                 </div>
               )}
             </div>
           )}
 
-          {/* ── Predictions ──────────────────────────────────────────── */}
           {tab === "history" && (
             <div>
               <div className="history-tab-header">
-                <p className="history-tab-desc">
-                  All letter predictions recorded by the ML model above the
-                  confidence threshold.
-                </p>
+                <p className="history-tab-desc">{t("dash.allPredictions")}</p>
                 <button
                   className="btn-danger"
+                  disabled={history.length === 0}
                   onClick={async () => {
-                    if (!confirm("Delete all prediction history?")) return;
+                    if (!confirm(t("dash.deleteConfirmPred"))) return;
                     await deleteHistory();
                     setHistory([]);
                     loadAll();
                   }}
-                  disabled={history.length === 0}
                 >
-                  ✕ Clear All
+                  {t("dash.clearAll")}
                 </button>
               </div>
               {history.length === 0 ? (
-                <div className="empty-state">No predictions yet.</div>
+                <div className="empty-state">{t("dash.noPredictions")}</div>
               ) : (
                 <div className="history-table-wrap">
                   <table className="history-table">
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>Letter</th>
-                        <th>Confidence</th>
-                        <th>Session</th>
-                        <th>Time</th>
+                        <th>{t("dash.id")}</th>
+                        <th>{t("dash.letter")}</th>
+                        <th>{t("dash.confidence")}</th>
+                        <th>{t("dash.session")}</th>
+                        <th>{t("dash.time")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -283,29 +287,25 @@ export function AdminDashboardPage() {
             </div>
           )}
 
-          {/* ── Sentences ─────────────────────────────────────────────── */}
           {tab === "sentences" && (
             <div>
               <div className="history-tab-header">
-                <p className="history-tab-desc">
-                  Sentences saved by users from the Word Builder. Click ▶ to
-                  hear them read aloud.
-                </p>
+                <p className="history-tab-desc">{t("dash.sentencesDesc")}</p>
                 <button
                   className="btn-danger"
+                  disabled={sentences.length === 0}
                   onClick={async () => {
-                    if (!confirm("Delete all saved sentences?")) return;
+                    if (!confirm(t("dash.deleteConfirmSent"))) return;
                     await deleteSentences();
                     setSentences([]);
                     loadAll();
                   }}
-                  disabled={sentences.length === 0}
                 >
-                  ✕ Clear All
+                  {t("dash.clearAll")}
                 </button>
               </div>
               {sentences.length === 0 ? (
-                <div className="empty-state">No saved sentences yet.</div>
+                <div className="empty-state">{t("dash.noSentences")}</div>
               ) : (
                 <div className="sentences-list">
                   {sentences.map((s, i) => (
@@ -314,7 +314,7 @@ export function AdminDashboardPage() {
                       <div className="sentence-row-main">
                         <span className="sentence-row-text">{s.text}</span>
                         <span className="sentence-row-session">
-                          Session {s.session_id.slice(-5)}
+                          {t("dash.session")} {s.session_id.slice(-5)}
                         </span>
                       </div>
                       <div className="sentence-row-right">
@@ -324,7 +324,7 @@ export function AdminDashboardPage() {
                         <button
                           className="btn-tts-small"
                           onClick={() => speakText(s.text)}
-                          title="Read aloud"
+                          title={t("rec.speak")}
                         >
                           ▶
                         </button>
@@ -336,11 +336,10 @@ export function AdminDashboardPage() {
             </div>
           )}
 
-          {/* ── Settings ──────────────────────────────────────────────── */}
           {tab === "settings" && (
             <div>
               <p className="history-tab-desc" style={{ marginBottom: 16 }}>
-                These settings are stored in SQLite and take effect immediately.
+                {t("dash.settingsDesc")}
               </p>
               <div className="settings-list">
                 {settings.map((s) => (
@@ -368,8 +367,8 @@ export function AdminDashboardPage() {
                         {saving[s.key]
                           ? "…"
                           : saved[s.key]
-                            ? "✓ Saved"
-                            : "Save"}
+                            ? t("set.saved")
+                            : t("set.save")}
                       </button>
                     </div>
                   </div>
